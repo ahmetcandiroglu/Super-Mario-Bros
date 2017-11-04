@@ -5,11 +5,8 @@ import model.Map;
 import model.brick.Brick;
 import model.brick.NonEmptyBrick;
 import model.enemy.Enemy;
-import model.hero.MarioForm;
 import model.prize.BoostItem;
-import model.prize.BoostType;
 import model.prize.Coin;
-import model.prize.Prize;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,13 +17,15 @@ public class GameEngine extends JFrame{
 	private final int FPS = 25;
 
 	private double remainingTime;
-	private int remainingLives;
-	private int acquiredCoins;
-	private int acquiredPoints;
+
 	private Map gameMap;
+
 	private InputManager inputManager;
+
 	private static UIManager uiManager;
+
 	private Timer timer;
+
 
 	private GameEngine(String title){
 		super(title);
@@ -43,36 +42,21 @@ public class GameEngine extends JFrame{
 
 	private void init(){
 		remainingTime = 0;
-		remainingLives = 3;
-		acquiredCoins = 0;
-		acquiredPoints = 0;
 		uiManager = new UIManager(720, 480);
-		gameMap = new Map();
+		gameMap = new Map(4, 400*1000);
 		timer = new Timer(1000/FPS, null);
 	}
 
-	public void startGame(){
-		init();
+	private void startGame(){
+		timer.start();
 	}
 
-	public boolean pauseGame(){
-		if(timer.isRunning()){
-			timer.stop();
-			return true;
-		}
-		else{
-			return false;
-		}
+	private void pauseGame(){
+		timer.stop();
 	}
 
-	public boolean resumeGame(){
-		if(!timer.isRunning()){
-			timer.start();
-			return true;
-		}
-		else{
-			return false;
-		}
+	private void resumeGame(){
+		timer.start();
 	}
 
 	private boolean isTimeUp(){
@@ -80,7 +64,12 @@ public class GameEngine extends JFrame{
 	}
 
 	private boolean isDead(){
-		return remainingLives == 0;
+		return gameMap.isDead();
+	}
+
+	private void gameOver() {
+		timer.stop();
+		uiManager.gameOver();
 	}
 
 	public void gameLoop(ButtonAction action){
@@ -91,54 +80,11 @@ public class GameEngine extends JFrame{
 			gameOver();
 		}
 
+		analyzeInput(action);
 		checkContact();
-
-		//get action from input manager
-
-		//act on mario
-
 		updateTime();
-
 		drawMap(gameMap);
 	}
-
-	private void gameOver() {
-	}
-
-	private void killEnemy(Enemy enemyToKill){
-		gameMap.killEnemy(enemyToKill);
-	}
-
-	private Prize revealBrick(NonEmptyBrick brickToReveal){
-		return brickToReveal.revealPrize();
-	}
-
-	private void acquireBoostItem(BoostItem boost){
-		BoostType boostType = boost.getType();
-
-		switch (boostType){
-			case FIRE_FLOWER:{
-				gameMap.addMarioForm(MarioForm.FIRE);
-			}
-			case ONEUP_MUSH:{
-				remainingLives++;
-			}
-			case SUPER_MUSH:{
-				gameMap.addMarioForm(MarioForm.SUPER);
-			}
-			case SUPER_STAR:{
-				gameMap.addMarioForm(MarioForm.INVINCIBLE);
-			}
-		}
-
-		acquirePoint(boost.getPoint());
-	}
-
-	private void acquireCoin(Coin coin){
-		acquiredCoins++;
-		acquirePoint(coin.getPoint());
-	}
-
 
 	private void checkFireballContact(){
 		ArrayList<Point> fireballLocations = gameMap.getFireballLocations();
@@ -171,8 +117,35 @@ public class GameEngine extends JFrame{
 		}
 	}
 
-	private BoostItem checkBoostItemContact() {
-		return null;
+	private void checkBoostItemContact() {
+		Point marioLocation = gameMap.getMarioLocation();
+		Dimension marioDimension = gameMap.getMarioDimensions();
+
+		int a = marioLocation.x;
+		int b = marioLocation.x + marioDimension.width;
+		int c = marioLocation.y;
+		int d = marioLocation.y + marioDimension.height;
+
+		ArrayList<Point> boostItemLocations = gameMap.getBoostItemLocations();
+		Dimension coinDimension = Coin.DIMENSION;
+
+		for(int i = 0; i < boostItemLocations.size(); i++){
+			Point boostItemLocation = boostItemLocations.get(i);
+
+			boolean x_axis = (a < boostItemLocation.x + coinDimension.width && a > boostItemLocation.x)
+					|| (b < boostItemLocation.x + coinDimension.width && b > boostItemLocation.x);
+
+			boolean y_axis = (c < boostItemLocation.y + coinDimension.height && c > boostItemLocation.y)
+					|| (d < boostItemLocation.y + coinDimension.height && d > boostItemLocation.y);
+
+			if(x_axis || y_axis){
+				acquireBoostItem(gameMap.getBoostItemWithIndex(i));
+			}
+		}
+	}
+
+	private void acquireBoostItem(BoostItem boost){
+		gameMap.acquireBoostItem(boost);
 	}
 
 	private void checkEnemyContact(){
@@ -204,7 +177,9 @@ public class GameEngine extends JFrame{
 		}
 	}
 
-	private void touchedEnemy(Enemy enemy){}
+	private void touchedEnemy(Enemy enemy){
+		gameMap.touchedEnemy(enemy);
+	}
 
 	private void stompOnEnemy(Enemy enemy){
 		gameMap.killEnemy(enemy);
@@ -230,6 +205,41 @@ public class GameEngine extends JFrame{
 		}
 	}
 
+	private void revealBrick(NonEmptyBrick brickToReveal){
+		gameMap.revealBrick(brickToReveal);
+	}
+
+	private void checkCoinContact(){
+		Point marioLocation = gameMap.getMarioLocation();
+		Dimension marioDimension = gameMap.getMarioDimensions();
+
+		int a = marioLocation.x;
+		int b = marioLocation.x + marioDimension.width;
+		int c = marioLocation.y;
+		int d = marioLocation.y + marioDimension.height;
+
+		ArrayList<Point> coinLocations = gameMap.getCoinLocations();
+		Dimension coinDimension = Coin.DIMENSION;
+
+		for(int i = 0; i < coinLocations.size(); i++){
+			Point coinLocation = coinLocations.get(i);
+
+			boolean x_axis = (a < coinLocation.x + coinDimension.width && a > coinLocation.x)
+					|| (b < coinLocation.x + coinDimension.width && b > coinLocation.x);
+
+			boolean y_axis = (c < coinLocation.y + coinDimension.height && c > coinLocation.y)
+					|| (d < coinLocation.y + coinDimension.height && d > coinLocation.y);
+
+			if(x_axis || y_axis){
+				acquireCoin(gameMap.getCoinWithIndex(i));
+			}
+		}
+	}
+
+	private void acquireCoin(Coin coin){
+		gameMap.acquireCoin(coin);
+	}
+
 	private void checkContact(){
 
 		checkFireballContact();
@@ -239,20 +249,34 @@ public class GameEngine extends JFrame{
 		checkEnemyContact();
 
 		checkBrickContact();
+
+		checkCoinContact();
 	}
 
 	private void drawMap(Map updatedMap){
-
+		uiManager.drawMapComponents(updatedMap);
 	}
 
 	private void updateTime(){
 		remainingTime =- 1000/FPS;
 	}
 
-	private void actOnMario(ButtonAction action){}
+	private void analyzeInput(ButtonAction action){
+		switch (action){
+			case START: {
+				startGame();
+			}
+			case PAUSE: {
+				pauseGame();
+			}
+			case RESUME: {
+				resumeGame();
+			}
+			case NO_ACTION: {
 
-	private void acquirePoint(int point){
-		acquiredPoints =+ point;
+			}
+			default: gameMap.actOnMario(action);
+		}
 	}
 
 	public static void main(String[] args) {

@@ -2,6 +2,8 @@ package model.enemy;
 
 import model.GameObject;
 
+import java.awt.*;
+
 public class Enemy extends GameObject{
 
     private boolean movable;

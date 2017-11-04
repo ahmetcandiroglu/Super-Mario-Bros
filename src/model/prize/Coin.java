@@ -1,10 +1,26 @@
 package model.prize;
 
-import javax.swing.*;
+import model.GameObject;
 
-public class Coin {
+import java.awt.*;
 
-    private ImageIcon style;
 
-    public void reveal(){}
+public class Coin extends GameObject{
+
+    public static final Dimension DIMENSION = new Dimension(10, 10);
+
+    private int point;
+
+    public Coin(int point){
+        this.point = point;
+    }
+
+    public int getPoint() {
+        return point;
+    }
+
+    @Override
+    public void draw() {
+
+    }
 }

@@ -8,6 +8,8 @@ public class BoostItem extends GameObject{
 
     private BoostType type;
 
+    private int point;
+
     public boolean isRevealed() {
         return revealed;
     }
@@ -22,6 +24,14 @@ public class BoostItem extends GameObject{
 
     public void setType(BoostType type) {
         this.type = type;
+    }
+
+    public int getPoint() {
+        return point;
+    }
+
+    public void setPoint(int point) {
+        this.point = point;
     }
 
     @Override

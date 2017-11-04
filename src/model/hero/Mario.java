@@ -1,15 +1,32 @@
 package model.hero;
 
-public class Mario {
+import model.GameObject;
 
-    private MarioForm form;
+import java.util.HashSet;
+import java.util.Set;
 
-    public MarioForm getForm() {
-        return form;
+public class Mario extends GameObject{
+
+    private Set<MarioForm> forms;
+
+    public Mario(){
+        forms = new HashSet<>();
     }
 
-    public void setForm(MarioForm form) {
-        this.form = form;
+    public Set<MarioForm> getForms() {
+        return forms;
     }
 
+    public void addForm(MarioForm formToAdd){
+        forms.add(formToAdd);
+    }
+
+    public void removeForm(MarioForm formToRemove){
+        forms.remove(formToRemove);
+    }
+
+    @Override
+    public void draw() {
+
+    }
 }

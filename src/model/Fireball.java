@@ -1,7 +1,11 @@
 package model;
 
 
+import java.awt.*;
+
 public class Fireball extends GameObject{
+
+    public static final Dimension DIMENSION = new Dimension(5, 5);
 
     private boolean hitEnemy;
 

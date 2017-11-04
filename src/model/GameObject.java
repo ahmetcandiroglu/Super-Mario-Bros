@@ -1,6 +1,5 @@
 package model;
 
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,6 +8,8 @@ public abstract class GameObject {
     private Point location;
 
     private ImageIcon style;
+
+    private Dimension dimension;
 
     public Point getLocation() {
         return location;
@@ -28,4 +29,7 @@ public abstract class GameObject {
 
     public abstract void draw();
 
+    public Dimension getDimension(){
+        return dimension;
+    }
 }

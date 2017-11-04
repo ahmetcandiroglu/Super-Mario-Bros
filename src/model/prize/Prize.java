@@ -1,5 +1,6 @@
 package model.prize;
 
-public abstract class Prize {
+public interface Prize {
 
+    int getPoint();
 }

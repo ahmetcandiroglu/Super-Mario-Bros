@@ -3,7 +3,6 @@ package manager;
 import model.Fireball;
 import model.Map;
 import model.brick.Brick;
-import model.brick.NonEmptyBrick;
 import model.enemy.Enemy;
 import model.prize.BoostItem;
 import model.prize.Coin;
@@ -198,14 +197,12 @@ public class GameEngine extends JFrame{
 					&& marioLocation.y > brickLocation.y);
 
 			if(y_axis){
-				if(gameMap.getBrickWithIndex(i) instanceof NonEmptyBrick){
-					revealBrick((NonEmptyBrick) gameMap.getBrickWithIndex(i));
-				}
+				revealBrick(gameMap.getBrickWithIndex(i));
 			}
 		}
 	}
 
-	private void revealBrick(NonEmptyBrick brickToReveal){
+	private void revealBrick(Brick brickToReveal){
 		gameMap.revealBrick(brickToReveal);
 	}
 

@@ -34,7 +34,29 @@ public class Enemy extends GameObject{
         this.type = type;
     }
 
-    public void move(){}
+     // incomplete; update obstruction condition
+    public void move(Direction direction) {
+    	if (isMovable()) {
+    		
+    		boolean obstruction = false;
+    		Point location = getLocation();
+    		Point newLocation;
+    		
+    		while (!obstruction) {
+    			if( this.direction == Direction.LEFT )
+        		{
+    				newLocation = new Point(location.x - 1, location.y);
+    				setLocation(newLocation);
+        		}
+    			if( this.direction == Direction.RIGHT )
+        		{
+    				newLocation = new Point(location.x + 1, location.y);
+    				setLocation(newLocation);
+        		}
+    		}
+    		
+    	}
+    }
 
     @Override
     public void draw() {

@@ -53,11 +53,42 @@ public class Map {
     }
 
     public void actOnMario(ButtonAction action){
+    	Point currentLocation = getMarioLocation();
+    	Point newLocation;
+    	
+    	
         switch (action){
-            case JUMP:{}
-            case M_RIGHT:{}
-            case M_LEFT:{}
-            case FIRE:{}
+            case JUMP:
+            {
+            	for( int i = 0; i <= 30; i++)
+            	{
+            		int x = getMarioLocation().x;
+                	int y = getMarioLocation().y;                	
+            		newLocation = new Point( x, y - 1); 
+            		mario.setLocation(newLocation);
+            	}
+            	for( int i = 0; i <= 30; i++)
+            	{
+            		int x = getMarioLocation().x;
+                	int y = getMarioLocation().y;                	
+            		newLocation = new Point( x, y + 1); 
+            		mario.setLocation(newLocation);
+            	}
+            }            
+            case M_RIGHT:
+            {
+            	newLocation = new Point(currentLocation.x + 1, currentLocation.y);
+            	mario.setLocation(newLocation);
+            }
+            case M_LEFT:
+            {
+            	newLocation = new Point(currentLocation.x - 1, currentLocation.y);
+            	mario.setLocation(newLocation);
+            }
+            case FIRE:
+            {
+            	
+            }
         }
     }
 

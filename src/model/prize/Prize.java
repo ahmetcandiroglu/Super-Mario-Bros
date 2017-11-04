@@ -1,10 +1,6 @@
 package model.prize;
 
-public abstract class Prize {
+public interface Prize {
 
-    private int point;
-
-    public int getPoint(){
-        return point;
-    }
+    int getPoint();
 }

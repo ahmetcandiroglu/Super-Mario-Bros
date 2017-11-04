@@ -2,15 +2,23 @@ package model.brick;
 
 import model.prize.Prize;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
-public class NonEmptyBrick {
+public class NonEmptyBrick extends Brick{
 
     private boolean visible;
 
-    private LinkedList<Prize> prize;
+    private ArrayList<Prize> prizeList;
 
     public Prize revealPrize(){
+        int size = prizeList.size();
+        if(size > 0){
+            if(size == 1) {
+                setType(BrickType.ORD_UNBREAKABLE);
+            }
+
+            return prizeList.remove(size-1);
+        }
         return null;
     }
 

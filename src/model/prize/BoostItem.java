@@ -2,7 +2,7 @@ package model.prize;
 
 import model.GameObject;
 
-public class BoostItem extends GameObject{
+public class BoostItem extends GameObject implements Prize{
 
     private boolean revealed = false;
 
@@ -26,6 +26,7 @@ public class BoostItem extends GameObject{
         this.type = type;
     }
 
+    @Override
     public int getPoint() {
         return point;
     }

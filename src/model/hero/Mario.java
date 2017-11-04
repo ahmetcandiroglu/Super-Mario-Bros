@@ -17,6 +17,10 @@ public class Mario extends GameObject{
         return forms;
     }
 
+    public void setForms(Set<MarioForm> forms) {
+        this.forms = forms;
+    }
+
     public void addForm(MarioForm formToAdd){
         forms.add(formToAdd);
     }

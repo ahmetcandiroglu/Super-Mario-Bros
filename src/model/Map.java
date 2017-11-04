@@ -3,11 +3,14 @@ package model;
 import manager.ButtonAction;
 import model.brick.Brick;
 import model.brick.BrickType;
+import model.brick.NonEmptyBrick;
 import model.enemy.Enemy;
 import model.hero.Mario;
 import model.hero.MarioForm;
 import model.prize.BoostItem;
+import model.prize.BoostType;
 import model.prize.Coin;
+import model.prize.Prize;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -15,24 +18,36 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Set;
 
 public class Map {
 
     private double timeLimitInMicro;
+
     private Mario mario;
+
     private int acquiredCoins;
+
     private int acquiredPoints;
+
+    private int remainingLives;
+
     private ArrayList<Brick> bricks = new ArrayList<>();
+
     private ArrayList<Enemy> enemies = new ArrayList<>();
+
     private ArrayList<Point> ground = new ArrayList<>();
+
     private ArrayList<Fireball> fireballs = new ArrayList<>();
+
     private ArrayList<Coin> coins = new ArrayList<>();
+
     private ArrayList<BoostItem> boostItems = new ArrayList<>();
+
     private BufferedImage backgroundImage;
-    private Point start, finish;
 
 
-    public Map(){
+    public Map(int remainingLives, double timeLimitInMicro){
         try{
             backgroundImage = ImageIO.read(new File("./src/media/temp_background.png"));
             System.out.println("Background image has been loaded..");
@@ -41,6 +56,13 @@ public class Map {
             backgroundImage = null;
             System.out.println("Background image does not exist!");
         }
+
+        acquiredPoints = 0;
+        acquiredCoins = 0;
+        this.remainingLives = remainingLives;
+        this.timeLimitInMicro = timeLimitInMicro;
+
+        mario = new Mario();
 
     }
 
@@ -108,6 +130,10 @@ public class Map {
         return getLocations(fireballs);
     }
 
+    public ArrayList<Point> getBoostItemLocations() {
+        return getLocations(boostItems);
+    }
+
     private ArrayList<Point> getLocations(ArrayList<? extends GameObject> list){
         ArrayList<Point> locations = new ArrayList<>();
 
@@ -134,7 +160,7 @@ public class Map {
         enemies.remove(enemyToKill);
     }
 
-    public void addMarioForm(MarioForm formToAdd){
+    private void addMarioForm(MarioForm formToAdd){
         mario.addForm(formToAdd);
     }
 
@@ -164,7 +190,7 @@ public class Map {
         return enemies.get(i);
     }
 
-    public Object getBrickWithIndex(int i) {
+    public Brick getBrickWithIndex(int i) {
         return bricks.get(i);
     }
 
@@ -190,9 +216,74 @@ public class Map {
         coins.remove(coin);
     }
 
-
-
     public Coin getCoinWithIndex(int i) {
         return coins.get(i);
+    }
+
+    public BoostItem getBoostItemWithIndex(int i) {
+        return boostItems.get(i);
+    }
+
+    public void acquireBoostItem(BoostItem boost) {
+        BoostType boostType = boost.getType();
+
+        switch (boostType){
+            case FIRE_FLOWER:{
+                addMarioForm(MarioForm.FIRE);
+            }
+            case ONEUP_MUSH:{
+                remainingLives++;
+            }
+            case SUPER_MUSH:{
+                addMarioForm(MarioForm.SUPER);
+            }
+            case SUPER_STAR:{
+                addMarioForm(MarioForm.INVINCIBLE);
+            }
+        }
+
+    }
+
+    public boolean isDead() {
+        return remainingLives == 0;
+    }
+
+    public void touchedEnemy(Enemy enemy) {
+        Set<MarioForm> marioForms = mario.getForms();
+        if(marioForms.contains(MarioForm.INVINCIBLE)){
+            killEnemy(enemy);
+        }
+        else if(marioForms.contains(MarioForm.FIRE)){
+            killEnemy(enemy);
+            marioForms.remove(MarioForm.FIRE);
+            mario.setForms(marioForms);
+        }
+        else if(marioForms.contains(MarioForm.SUPER)){
+            marioForms.remove(MarioForm.SUPER);
+            mario.setForms(marioForms);
+        }
+        else{
+            remainingLives--;
+        }
+    }
+
+    public void revealBrick(Brick brickToReveal) {
+        Set<MarioForm> marioForms = mario.getForms();
+
+        if(brickToReveal instanceof NonEmptyBrick){
+            Prize revealedPrize = ((NonEmptyBrick) brickToReveal).revealPrize();
+            if(revealedPrize instanceof Coin){
+                coins.add((Coin) revealedPrize);
+            }
+            else if(revealedPrize instanceof BoostItem){
+                boostItems.add((BoostItem) revealedPrize);
+            }
+        }
+
+        if(marioForms.contains(MarioForm.SUPER)){
+            if(brickToReveal.getType() == BrickType.ORD_BREAKABLE){
+                bricks.remove(brickToReveal);
+            }
+        }
     }
 }

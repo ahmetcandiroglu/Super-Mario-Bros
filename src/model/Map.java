@@ -1,5 +1,6 @@
 package model;
 
+import manager.ButtonAction;
 import model.brick.Brick;
 import model.brick.BrickType;
 import model.enemy.Enemy;
@@ -49,6 +50,15 @@ public class Map {
 
     public Point getMarioLocation(){
         return mario.getLocation();
+    }
+
+    public void actOnMario(ButtonAction action){
+        switch (action){
+            case JUMP:{}
+            case M_RIGHT:{}
+            case M_LEFT:{}
+            case FIRE:{}
+        }
     }
 
     public ArrayList<Point> getEnemyLocations(){

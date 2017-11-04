@@ -9,6 +9,8 @@ import model.prize.Coin;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class GameEngine extends JFrame{
@@ -21,7 +23,7 @@ public class GameEngine extends JFrame{
 
 	private InputManager inputManager;
 
-	private static UIManager uiManager;
+	private UIManager uiManager;
 
 	private Timer timer;
 
@@ -43,7 +45,7 @@ public class GameEngine extends JFrame{
 		remainingTime = 0;
 		uiManager = new UIManager(720, 480);
 		gameMap = new Map(4, 400*1000);
-		timer = new Timer(1000/FPS, null);
+		timer = new Timer(1000/FPS, inputListener);
 	}
 
 	private void startGame(){
@@ -275,6 +277,12 @@ public class GameEngine extends JFrame{
 			default: gameMap.actOnMario(action);
 		}
 	}
+
+	ActionListener inputListener = new ActionListener() {
+		public void actionPerformed(ActionEvent evt) {
+			gameLoop(inputManager.getAction());
+		}
+	};
 
 	public static void main(String[] args) {
 

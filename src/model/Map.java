@@ -49,7 +49,7 @@ public class Map {
 
     public Map(int remainingLives, double timeLimitInMicro){
         try{
-            backgroundImage = ImageIO.read(new File("./src/media/temp_background.png"));
+            backgroundImage = ImageIO.read(new File("./src/media/background/1-1.png"));
             System.out.println("Background image has been loaded..");
         }
         catch(IOException e){
@@ -285,5 +285,13 @@ public class Map {
                 bricks.remove(brickToReveal);
             }
         }
+    }
+
+    public void addBrick(Brick brick) {
+        bricks.add(brick);
+    }
+
+    public ArrayList<Brick> getBricks() {
+        return bricks;
     }
 }

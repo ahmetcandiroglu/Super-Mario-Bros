@@ -32,4 +32,8 @@ public abstract class GameObject {
     public Dimension getDimension(){
         return dimension;
     }
+
+    public void setDimension(Dimension dimension) {
+        this.dimension = dimension;
+    }
 }

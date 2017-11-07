@@ -2,6 +2,9 @@ package model.brick;
 
 import model.prize.Prize;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class NonEmptyBrick extends Brick{
@@ -9,6 +12,10 @@ public class NonEmptyBrick extends Brick{
     private boolean visible;
 
     private ArrayList<Prize> prizeList;
+
+    public NonEmptyBrick(Point location, BufferedImage style){
+        super(location, style);
+    }
 
     public Prize revealPrize(){
         int size = prizeList.size();

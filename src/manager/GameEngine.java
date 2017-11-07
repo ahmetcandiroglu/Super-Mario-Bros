@@ -4,64 +4,58 @@ import model.Fireball;
 import model.Map;
 import model.brick.Brick;
 import model.enemy.Enemy;
+import model.hero.Mario;
 import model.prize.BoostItem;
 import model.prize.Coin;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class GameEngine extends JFrame{
 
-	private final int FPS = 25;
-
-	private double remainingTime;
-
 	private Map gameMap;
+
+	private MapCreator mapCreator;
 
 	private InputManager inputManager;
 
 	private UIManager uiManager;
 
-	private Timer timer;
-
+	private GameStatus gameStatus;
 
 	private GameEngine(String title){
 		super(title);
 
 		init();
 
-		setContentPane(uiManager);
+		addKeyListener(inputManager);
+
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		pack();
-		setLocationRelativeTo(null);
+
+		setLayout(new BorderLayout());
+		add(uiManager, BorderLayout.CENTER);
+        pack();
+
+        setLocationRelativeTo(null);
 		setVisible(true);
-		setResizable(true);
+		setResizable(false);
+		System.out.println("Game engine initialized..");
 	}
 
 	private void init(){
-		remainingTime = 0;
-		uiManager = new UIManager(720, 480);
-		gameMap = new Map(4, 400*1000);
-		timer = new Timer(1000/FPS, inputListener);
-	}
+		uiManager = new UIManager(1280, 720);
 
-	private void startGame(){
-		timer.start();
-	}
+		mapCreator = new MapCreator();
+        gameMap = mapCreator.createMap(4, 400);
 
-	private void pauseGame(){
-		timer.stop();
-	}
-
-	private void resumeGame(){
-		timer.start();
+        inputManager = new InputManager(this, gameMap.getTimeLimit());
+        gameStatus = GameStatus.START_SCREEN;
+        drawMap(gameMap, gameStatus);
 	}
 
 	private boolean isTimeUp(){
-		return remainingTime <= gameMap.getTimeLimitInMicro();
+		return inputManager.getRemainingTime() == 0;
 	}
 
 	private boolean isDead(){
@@ -69,22 +63,24 @@ public class GameEngine extends JFrame{
 	}
 
 	private void gameOver() {
-		timer.stop();
+		inputManager.gameOver();
 		uiManager.gameOver();
+		System.out.println("Game over..");
 	}
 
-	public void gameLoop(ButtonAction action){
-		if(isTimeUp()){
-			gameOver();
+	void gameLoop(){
+        if(isTimeUp()){
+            System.out.println("time is up");
+            gameOver();
 		}
 		else if(isDead()){
-			gameOver();
+            System.out.println("dead");
+            gameOver();
 		}
 
-		analyzeInput(action);
 		checkContact();
-		updateTime();
-		drawMap(gameMap);
+		//inputManager.updateTime();
+		drawMap(gameMap, gameStatus);
 	}
 
 	private void checkFireballContact(){
@@ -252,40 +248,47 @@ public class GameEngine extends JFrame{
 		checkCoinContact();
 	}
 
-	private void drawMap(Map updatedMap){
-		uiManager.drawMapComponents(updatedMap);
+	private void updateLocations(){
+		//TODO: automate locations of enemies and boost items
 	}
 
-	private void updateTime(){
-		remainingTime =- 1000/FPS;
+	private void drawMap(Map updatedMap, GameStatus gameStatus){
+
+	    uiManager.drawMapComponents(updatedMap, gameStatus, inputManager.getRemainingTime());
 	}
 
-	private void analyzeInput(ButtonAction action){
-		switch (action){
-			case START: {
-				startGame();
-			}
-			case PAUSE: {
-				pauseGame();
-			}
-			case RESUME: {
-				resumeGame();
-			}
-			case NO_ACTION: {
-
-			}
-			default: gameMap.actOnMario(action);
-		}
+	void analyzeInput(ButtonAction action){
+	    if(gameStatus == GameStatus.RUNNING){
+            //gameMap.actOnMario(action);
+            boolean isRight = action == ButtonAction.M_RIGHT;
+            moveMario(isRight);
+	    }
 	}
 
-	ActionListener inputListener = new ActionListener() {
-		public void actionPerformed(ActionEvent evt) {
-			gameLoop(inputManager.getAction());
-		}
-	};
+    GameStatus getGameStatus() {
+        return gameStatus;
+    }
+
+	void setGameStatus(GameStatus status){
+	    gameStatus = status;
+    }
 
 	public static void main(String[] args) {
-
 		GameEngine game = new GameEngine("Super Mario Bros.");
+
+	}
+
+
+	//test method
+    void moveMario(boolean isRight) {
+		Mario m = gameMap.getMario();
+		Point p = m.getLocation();
+		if(isRight)
+			p.x = p.x + 4;
+		else
+			p.x = p.x - 4;
+
+		m.setLocation(p);
+		drawMap(gameMap, gameStatus);
 	}
 }

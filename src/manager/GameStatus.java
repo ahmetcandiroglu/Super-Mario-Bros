@@ -5,5 +5,6 @@ public enum GameStatus {
     LVL_UP,
     PAUSED,
     LOADING,
-    RUNNING
+    RUNNING,
+    START_SCREEN
 }

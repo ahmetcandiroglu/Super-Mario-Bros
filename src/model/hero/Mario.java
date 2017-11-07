@@ -2,6 +2,11 @@ package model.hero;
 
 import model.GameObject;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,6 +16,14 @@ public class Mario extends GameObject{
 
     public Mario(){
         forms = new HashSet<>();
+        setLocation( new Point(48*3,540));
+        setDimension( new Dimension(48, 96));
+        try{
+            setStyle( ImageIO.read(new File("./src/media/mario/super-mario.png")));
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Set<MarioForm> getForms() {

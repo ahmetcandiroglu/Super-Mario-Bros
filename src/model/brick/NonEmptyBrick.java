@@ -4,6 +4,7 @@ import model.prize.Prize;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class NonEmptyBrick extends Brick{
@@ -12,7 +13,7 @@ public class NonEmptyBrick extends Brick{
 
     private ArrayList<Prize> prizeList;
 
-    public NonEmptyBrick(Point location, ImageIcon style){
+    public NonEmptyBrick(Point location, BufferedImage style){
         super(location, style);
     }
 

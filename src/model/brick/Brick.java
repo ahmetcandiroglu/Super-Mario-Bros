@@ -4,14 +4,15 @@ import model.GameObject;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Brick extends GameObject{
 
-    public static final Dimension DIMENSION = new Dimension(10, 10);
+    public static final Dimension DIMENSION = new Dimension(16, 16);
 
     private BrickType type;
 
-    public Brick(Point location, ImageIcon style){
+    public Brick(Point location, BufferedImage style){
         setLocation(location);
         setStyle(style);
     }

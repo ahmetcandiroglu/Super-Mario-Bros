@@ -7,7 +7,6 @@ public enum ButtonAction {
     CROUCH,
     FIRE,
     START,
-    PAUSE,
-    RESUME,
+    PAUSE_RESUME,
     NO_ACTION
 }

@@ -22,7 +22,9 @@ import java.util.Set;
 
 public class Map {
 
-    private double timeLimitInMicro;
+    private double timeLimit;
+
+    private int remainingLives;
 
     private Mario mario;
 
@@ -30,13 +32,11 @@ public class Map {
 
     private int acquiredPoints;
 
-    private int remainingLives;
-
     private ArrayList<Brick> bricks = new ArrayList<>();
 
     private ArrayList<Enemy> enemies = new ArrayList<>();
 
-    private ArrayList<Point> ground = new ArrayList<>();
+    private ArrayList<Point[]> ground = new ArrayList<>();
 
     private ArrayList<Fireball> fireballs = new ArrayList<>();
 
@@ -47,9 +47,9 @@ public class Map {
     private BufferedImage backgroundImage;
 
 
-    public Map(int remainingLives, double timeLimitInMicro){
+    public Map(int remainingLives, double timeLimit){
         try{
-            backgroundImage = ImageIO.read(new File("./src/media/background/1-1.png"));
+            backgroundImage = ImageIO.read(new File("./src/media/background/background.png"));
             System.out.println("Background image has been loaded..");
         }
         catch(IOException e){
@@ -60,7 +60,7 @@ public class Map {
         acquiredPoints = 0;
         acquiredCoins = 0;
         this.remainingLives = remainingLives;
-        this.timeLimitInMicro = timeLimitInMicro;
+        this.timeLimit = timeLimit;
 
         mario = new Mario();
 
@@ -198,8 +198,8 @@ public class Map {
         fireballs.remove(i);
     }
 
-    public double getTimeLimitInMicro() {
-        return timeLimitInMicro;
+    public double getTimeLimit() {
+        return timeLimit;
     }
 
     public void acquirePoints(int point) {
@@ -293,5 +293,9 @@ public class Map {
 
     public ArrayList<Brick> getBricks() {
         return bricks;
+    }
+
+    public void addGroundPointPair(Point[] groundPointPair) {
+        ground.add(groundPointPair);
     }
 }

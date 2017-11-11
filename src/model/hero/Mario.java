@@ -2,48 +2,74 @@ package model.hero;
 
 import model.GameObject;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.awt.image.BufferedImage;
 
-public class Mario extends GameObject{
+public abstract class Mario extends GameObject{
 
-    private Set<MarioForm> forms;
+    private int remainingLives;
 
-    public Mario(){
-        forms = new HashSet<>();
-        setLocation( new Point(48*3,540));
-        setDimension( new Dimension(48, 96));
-        try{
-            setStyle( ImageIO.read(new File("./src/media/mario/super-mario.png")));
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+    private int points;
+
+    private double invincibilityTimer;
+
+    private boolean strong, shootFire, invincible;
+
+    public Mario(double x, double y, BufferedImage style){
+        super(x, y, style);
+        remainingLives = 3;
+        points = 0;
+        invincibilityTimer = 0;
     }
 
-    public Set<MarioForm> getForms() {
-        return forms;
+    public int getRemainingLives() {
+        return remainingLives;
     }
 
-    public void setForms(Set<MarioForm> forms) {
-        this.forms = forms;
+    public void setRemainingLives(int remainingLives) {
+        this.remainingLives = remainingLives;
     }
 
-    public void addForm(MarioForm formToAdd){
-        forms.add(formToAdd);
+    public double getInvincibilityTimer() {
+        return invincibilityTimer;
     }
 
-    public void removeForm(MarioForm formToRemove){
-        forms.remove(formToRemove);
+    public void setInvincibilityTimer(double invincibilityTimer) {
+        this.invincibilityTimer = invincibilityTimer;
     }
 
-    @Override
-    public void draw() {
+    public boolean isStrong() {
+        return strong;
+    }
 
+    public void setStrong(boolean strong) {
+        this.strong = strong;
+    }
+
+    public boolean isShootFire() {
+        return shootFire;
+    }
+
+    public void setShootFire(boolean shootFire) {
+        this.shootFire = shootFire;
+    }
+
+    public boolean isInvincible() {
+        return invincible;
+    }
+
+    public void setInvincible(boolean invincible) {
+        this.invincible = invincible;
+    }
+
+    public void acquirePoints(int point){
+        points = points + point;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
     }
 }

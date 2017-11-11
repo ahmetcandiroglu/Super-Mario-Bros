@@ -3,16 +3,19 @@ package model.prize;
 import model.GameObject;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 
 public class Coin extends GameObject implements Prize{
 
-    public static final Dimension DIMENSION = new Dimension(10, 10);
-
     private int point;
 
-    public Coin(int point){
+    private boolean revealed;
+
+    public Coin(double x, double y, BufferedImage style, int point){
+        super(x, y, style);
         this.point = point;
+        revealed = false;
     }
 
     @Override
@@ -21,7 +24,12 @@ public class Coin extends GameObject implements Prize{
     }
 
     @Override
-    public void draw() {
+    public void updateLocation(){}
 
+    @Override
+    public void draw(Graphics g){
+        if(revealed){
+            g.drawImage(getStyle(), (int)getX(), (int)getY(), null);
+        }
     }
 }

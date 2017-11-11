@@ -8,6 +8,8 @@ public abstract class Mario extends GameObject{
 
     private int remainingLives;
 
+    private int coins;
+
     private int points;
 
     private double invincibilityTimer;
@@ -18,6 +20,7 @@ public abstract class Mario extends GameObject{
         super(x, y, style);
         remainingLives = 3;
         points = 0;
+        coins = 0;
         invincibilityTimer = 0;
     }
 
@@ -71,5 +74,13 @@ public abstract class Mario extends GameObject{
 
     public void setPoints(int points) {
         this.points = points;
+    }
+
+    public int getCoins() {
+        return coins;
+    }
+
+    public void setCoins(int coins) {
+        this.coins = coins;
     }
 }

@@ -1,10 +1,9 @@
 package manager;
 
+import model.brick.*;
+import model.hero.FireMario;
+import view.ImageLoader;
 import model.Map;
-import model.brick.Brick;
-import model.brick.OrdinaryBrick;
-import model.brick.Pipe;
-import model.brick.SurpriseBrick;
 import model.enemy.Enemy;
 import model.enemy.Goomba;
 import model.enemy.KoopaTroopa;
@@ -13,52 +12,51 @@ import model.hero.SmallMario;
 import model.prize.Coin;
 import model.prize.Prize;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 class MapCreator {
 
-    private BufferedImage mapImage, backgroundImage, mario;
-    private BufferedImage superMushroom, oneUpMushroom, fireMushroom, coin;
+    private ImageLoader imageLoader;
+
+    private BufferedImage backgroundImage, mario;
+    private BufferedImage superMushroom, oneUpMushroom, fireFlower, coin;
     private BufferedImage ordinaryBrick, surpriseBrick, groundBrick, pipe;
     private BufferedImage goomba, koopa;
 
 
-    MapCreator(int screenWidth, int screenHeight) {
+    MapCreator(ImageLoader imageLoader) {
 
-        try {
-            mapImage = ImageIO.read(new File("./src/media/map/created.png"));
-            backgroundImage = ImageIO.read(new File("./src/media/background/background.png"));
-            mario = ImageIO.read(new File("./src/media/mario/small-mario.png"));
-            ordinaryBrick = ImageIO.read(new File("./src/media/brick/ordinary-brick.png"));
-            surpriseBrick = ImageIO.read(new File("./src/media/brick/surprise-brick.png"));
-            groundBrick = ImageIO.read(new File("./src/media/brick/ground-brick.png"));
-            pipe = ImageIO.read(new File("./src/media/brick/pipe-s.png"));
-            goomba = ImageIO.read(new File("./src/media/enemy/goomba.png"));
-            koopa = ImageIO.read(new File("./src/media/enemy/koopa.png"));
-            superMushroom = ImageIO.read(new File("./src/media/map/created.png"));
-            oneUpMushroom = ImageIO.read(new File("./src/media/map/created.png"));
-            fireMushroom = ImageIO.read(new File("./src/media/map/created.png"));
-            coin = ImageIO.read(new File("./src/media/map/created.png"));
+        this.imageLoader = imageLoader;
+        BufferedImage sprite = imageLoader.loadImage("/sprite.png");
+        BufferedImage marioForms = imageLoader.loadImage("/mario-forms.png");
 
-            System.out.println("Images have been loaded..");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.backgroundImage = imageLoader.loadImage("/background.png");
+        this.mario = imageLoader.getSubImage(marioForms, 2, 5, 52, 48);
+        this.superMushroom = imageLoader.getSubImage(sprite, 2, 5, 48, 48);
+        this.oneUpMushroom= imageLoader.getSubImage(sprite, 3, 5, 48, 48);
+        this.fireFlower= imageLoader.getSubImage(sprite, 4, 5, 48, 48);
+        this.coin = imageLoader.getSubImage(sprite, 1, 5, 48, 48);
+        this.ordinaryBrick = imageLoader.getSubImage(sprite, 1, 1, 48, 48);
+        this.surpriseBrick = imageLoader.getSubImage(sprite, 2, 1, 48, 48);
+        this.groundBrick = imageLoader.getSubImage(sprite, 2, 2, 48, 48);
+        this.pipe = imageLoader.getSubImage(sprite, 3, 1, 96, 96);
+        this.goomba = imageLoader.getSubImage(sprite, 2, 4, 48, 48);
+        this.koopa = imageLoader.getSubImage(sprite, 1, 3, 48, 96);
     }
 
-    Map createMap(double timeLimit) {
+    Map createMap(String mapPath, double timeLimit) {
+        BufferedImage mapImage = imageLoader.loadImage("/map.png");
+        BufferedImage[] leftFrames = imageLoader.getLeftFrames(2);
+        BufferedImage[] rightFrames = imageLoader.getRightFrames(2);
+
         if (mapImage == null) {
             System.out.println("Given path is invalid...");
             return null;
         }
 
         Map createdMap = new Map(timeLimit, backgroundImage);
-        int brickSize = this.surpriseBrick.getHeight();
+        int pixelMultiplier = 48;
 
         int mario = new Color(160, 160, 160).getRGB();
         int ordinaryBrick = new Color(0, 0, 255).getRGB();
@@ -66,7 +64,7 @@ class MapCreator {
         int groundBrick = new Color(255, 0, 0).getRGB();
         int pipe = new Color(0, 255, 0).getRGB();
         int goomba = new Color(0, 255, 255).getRGB();
-        int koompa = new Color(255, 0, 255).getRGB();
+        int koopa = new Color(255, 0, 255).getRGB();
 
 
         for (int x = 0; x < mapImage.getWidth(); x++) {
@@ -76,37 +74,37 @@ class MapCreator {
                 Prize prize = new Coin(x, y, this.coin, 50);
 
                 if (currentPixel == ordinaryBrick) {
-                    Brick brick = new OrdinaryBrick(x*brickSize, y*brickSize, this.ordinaryBrick);
+                    Brick brick = new OrdinaryBrick(x*pixelMultiplier, y*pixelMultiplier, this.ordinaryBrick);
                     createdMap.addBrick(brick);
                 }
                 else if (currentPixel == surpriseBrick) {
-                    Brick brick = new SurpriseBrick(x*brickSize, y*brickSize, this.surpriseBrick, prize);
+                    Brick brick = new SurpriseBrick(x*pixelMultiplier, y*pixelMultiplier, this.surpriseBrick, prize);
                     createdMap.addBrick(brick);
                 }
                 else if (currentPixel == pipe) {
-                    Brick brick = new Pipe(x*brickSize, y*brickSize, this.pipe);
+                    Brick brick = new Pipe(x*pixelMultiplier, y*pixelMultiplier, this.pipe);
                     createdMap.addGroundBrick(brick);
                 }
                 else if (currentPixel == groundBrick) {
-                    Brick brick = new Pipe(x*brickSize, y*brickSize, this.groundBrick);
+                    Brick brick = new GroundBrick(x*pixelMultiplier, y*pixelMultiplier, this.groundBrick);
                     createdMap.addGroundBrick(brick);
                 }
                 else if (currentPixel == goomba) {
-                    Enemy enemy = new Goomba(x*brickSize, y*brickSize, this.goomba);
+                    Enemy enemy = new Goomba(x*pixelMultiplier, y*pixelMultiplier, this.goomba);
                     createdMap.addEnemy(enemy);
                 }
-                else if (currentPixel == koompa) {
-                    Enemy enemy = new KoopaTroopa(x*brickSize, y*brickSize, this.koopa);
+                else if (currentPixel == koopa) {
+                    Enemy enemy = new KoopaTroopa(x*pixelMultiplier, y*pixelMultiplier, this.koopa);
                     createdMap.addEnemy(enemy);
                 }
                 else if (currentPixel == mario) {
-                    Mario marioObject = new SmallMario(x*brickSize, y*brickSize, this.mario);
+                    Mario marioObject = new FireMario(x*pixelMultiplier, y*pixelMultiplier, leftFrames, rightFrames);
                     createdMap.setMario(marioObject);
                 }
             }
         }
 
-        System.out.println("Map created..");
+        System.out.println("Map is created..");
         return createdMap;
     }
 

@@ -6,28 +6,22 @@ import model.hero.Mario;
 import model.prize.BoostItem;
 import model.prize.Coin;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Map {
 
     private double timeLimit;
-
     private Mario mario;
-
     private ArrayList<Brick> bricks = new ArrayList<>();
-
     private ArrayList<Enemy> enemies = new ArrayList<>();
-
     private ArrayList<Brick> groundBricks = new ArrayList<>();
-
     private ArrayList<Fireball> fireballs = new ArrayList<>();
-
     private ArrayList<Coin> coins = new ArrayList<>();
-
     private ArrayList<BoostItem> boostItems = new ArrayList<>();
-
     private BufferedImage backgroundImage;
+    private double bottomBorder = 720 - 96;
 
 
     public Map(double timeLimit, BufferedImage backgroundImage) {
@@ -117,5 +111,53 @@ public class Map {
 
     public void addEnemy(Enemy enemy) {
         this.enemies.add(enemy);
+    }
+
+    public void drawMap(Graphics2D g2){
+        drawBackground(g2);
+        drawBricks(g2);
+        drawEnemies(g2);
+        drawMario(g2);
+    }
+
+    private void drawBackground(Graphics2D g2){
+        g2.drawImage(backgroundImage, 0, 0, null);
+    }
+
+    private void drawBricks(Graphics2D g2) {
+        for(Brick brick : bricks){
+            brick.draw(g2);
+        }
+
+        for(Brick brick : groundBricks){
+            brick.draw(g2);
+        }
+    }
+
+    private void drawEnemies(Graphics2D g2) {
+        for(Enemy enemy : enemies){
+            enemy.draw(g2);
+        }
+    }
+
+    private void drawMario(Graphics2D g2) {
+        mario.draw(g2);
+    }
+
+    public void updateLocations() {
+        mario.updateLocation();
+    }
+
+    public ArrayList<Brick> getAllBricks() {
+        ArrayList<Brick> allBricks = new ArrayList<>();
+
+        allBricks.addAll(bricks);
+        allBricks.addAll(groundBricks);
+
+        return allBricks;
+    }
+
+    public double getBottomBorder() {
+        return bottomBorder;
     }
 }

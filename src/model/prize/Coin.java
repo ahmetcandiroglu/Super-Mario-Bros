@@ -16,6 +16,7 @@ public class Coin extends GameObject implements Prize{
         super(x, y, style);
         this.point = point;
         revealed = false;
+        setDimension(30, 42);
     }
 
     @Override

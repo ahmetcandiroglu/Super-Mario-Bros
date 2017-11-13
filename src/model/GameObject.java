@@ -20,8 +20,11 @@ public abstract class GameObject {
     public GameObject(double x, double y, BufferedImage style){
         setLocation(x, y);
         setStyle(style);
-        setDimension( getStyle().getWidth(), getStyle().getHeight());
+        setVelX(0);
+        setVelY(0);
         setGravityAcc(0.38);
+        jumping = false;
+        falling = true;
     }
 
     public void draw(Graphics g) {
@@ -30,22 +33,32 @@ public abstract class GameObject {
         if(style != null){
             g.drawImage(style, (int)x, (int)y, null);
         }
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setColor(Color.WHITE);
+
+        g2.draw(getTopBounds());
+        g2.draw(getBottomBounds());
+        g2.draw(getRightBounds());
+        g2.draw(getLeftBounds());
     }
 
     public void updateLocation() {
-        double updatedX = getX() + getVelX();
-        double updatedY = getY() + getVelY();
-        double updatedVelY = getVelY();
-
-        if(isFalling()){
-            updatedVelY = updatedVelY + getGravityAcc();
+        System.out.println(velY);
+        if(jumping && velY <= 0){
+            jumping = false;
+            falling = true;
         }
-        if(isJumping()){
-            updatedVelY = updatedVelY - getGravityAcc();
+        else if(jumping){
+            velY = velY - gravityAcc;
+            y = y - velY;
         }
 
-        setLocation(updatedX, updatedY);
-        setVelY(updatedVelY);
+        if(falling){
+            y = y + velY;
+            velY = velY + gravityAcc;
+        }
+
+        x = x + velX;
     }
 
     public void setLocation(double x, double y) {
@@ -112,19 +125,19 @@ public abstract class GameObject {
     }
 
     public Rectangle getTopBounds(){
-        return new Rectangle((int)x, (int)y, dimension.width, dimension.height/2);
+        return new Rectangle((int)x + dimension.width/5, (int)y, 3*dimension.width/5, dimension.height/2);
     }
 
     public Rectangle getBottomBounds(){
-        return new Rectangle((int)x, (int)y + dimension.height/2, dimension.width, dimension.height/2);
+        return new Rectangle((int)x + dimension.width/5, (int)y + dimension.height/2, 3*dimension.width/5, dimension.height/2);
     }
 
     public Rectangle getLeftBounds(){
-        return new Rectangle((int)x, (int)y, dimension.width/4, dimension.height);
+        return new Rectangle((int)x, (int)y + dimension.height/4, dimension.width/4, dimension.height/2);
     }
 
     public Rectangle getRightBounds(){
-        return new Rectangle((int)x + 3*dimension.width/4, (int)y, dimension.width/4, dimension.height);
+        return new Rectangle((int)x + 3*dimension.width/4, (int)y + dimension.height/4, dimension.width/4, dimension.height/2);
     }
 
     public boolean isFalling() {

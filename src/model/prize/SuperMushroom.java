@@ -17,7 +17,7 @@ public class SuperMushroom extends BoostItem{
 
     @Override
     public Mario onTouch(Mario mario) {
-        mario.acquirePoints(getPoint());
+        /*mario.acquirePoints(getPoint());
 
         if(mario instanceof SmallMario){
             int remainingLives = mario.getRemainingLives();
@@ -29,7 +29,8 @@ public class SuperMushroom extends BoostItem{
             return newMario;
         }
 
-        return mario;
+        return mario;*/
+        return null;
     }
 
     private BufferedImage loadSuperStyle(){

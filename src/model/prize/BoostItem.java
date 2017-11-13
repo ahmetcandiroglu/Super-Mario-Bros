@@ -13,8 +13,8 @@ public abstract class BoostItem extends GameObject implements Prize{
     private int point;
 
     public BoostItem(double x, double y, BufferedImage style) {
-
         super(x, y, style);
+        setDimension(48, 48);
     }
 
     public abstract Mario onTouch(Mario mario);

@@ -10,7 +10,7 @@ public class Fireball extends GameObject{
     public Fireball(double x, double y, BufferedImage style) {
         super(x, y, style);
         setVelX(5);
-        setVelY(0);
+        setDimension(16, 16);
     }
 
     public boolean isHitEnemy() {

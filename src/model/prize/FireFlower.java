@@ -10,15 +10,15 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class FireMushroom extends BoostItem {
+public class FireFlower extends BoostItem {
 
-    public FireMushroom(double x, double y, BufferedImage style) {
+    public FireFlower(double x, double y, BufferedImage style) {
         super(x, y, style);
     }
 
     @Override
     public Mario onTouch(Mario mario) {
-        mario.acquirePoints(getPoint());
+        /*mario.acquirePoints(getPoint());
 
         if(mario instanceof SmallMario || mario instanceof SuperMario){
             int remainingLives = mario.getRemainingLives();
@@ -30,7 +30,8 @@ public class FireMushroom extends BoostItem {
             return newMario;
         }
 
-        return mario;
+        return mario;*/
+        return null;
     }
 
     private BufferedImage loadFireStyle(){

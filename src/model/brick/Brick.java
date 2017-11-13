@@ -2,32 +2,37 @@ package model.brick;
 
 import model.GameObject;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class Brick extends GameObject{
+public abstract class Brick extends GameObject{
 
-    public static final Dimension DIMENSION = new Dimension(16, 16);
+    private boolean breakable;
 
-    private BrickType type;
+    private boolean empty;
 
-    public Brick(Point location, BufferedImage style){
-        setLocation(location);
-        setStyle(style);
+    public Brick(double x, double y, BufferedImage style){
+        super(x, y, style);
+        setDimension(48, 48);
     }
 
-    public BrickType getType() {
-        return type;
+    public boolean isBreakable() {
+        return breakable;
     }
 
-    public void setType(BrickType type) {
-        this.type = type;
+    public void setBreakable(boolean breakable) {
+        this.breakable = breakable;
     }
 
+    public boolean isEmpty() {
+        return empty;
+    }
+
+    public void setEmpty(boolean empty) {
+        this.empty = empty;
+    }
 
     @Override
-    public void draw() {
+    public void updateLocation() {
 
     }
 }

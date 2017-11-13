@@ -1,113 +1,68 @@
 package manager;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class InputManager implements KeyListener, ActionListener {
 
-	private final int FPS = 1;
+public class InputManager implements KeyListener{
 
-	private GameEngine engine;
+    private GameEngine engine;
+    private double remainingTime;
 
-	private Timer timer;
+    InputManager(GameEngine engine, double remainingTime) {
+        this.engine = engine;
+        this.remainingTime = remainingTime;
+    }
 
-	private double remainingTime;
+    @Override
+    public void keyPressed(KeyEvent event) {
+        ButtonAction action = ButtonAction.NO_ACTION;
+        int keyCode = event.getKeyCode();
 
-
-	InputManager(GameEngine engine, double remainingTime){
-		this.engine = engine;
-		this.remainingTime = remainingTime;
-		timer = new Timer( 1000/FPS, this);
-	}
-
-	@Override
-	public void keyPressed(KeyEvent event) {
-	    ButtonAction action = ButtonAction.NO_ACTION;
-
-		if(event.getKeyCode() == KeyEvent.VK_UP){
-			action = ButtonAction.JUMP;
-		}
-		else if(event.getKeyCode() == KeyEvent.VK_RIGHT){
+        if (keyCode == KeyEvent.VK_UP) {
+            action = ButtonAction.JUMP;
+        } else if (keyCode == KeyEvent.VK_RIGHT) {
             action = ButtonAction.M_RIGHT;
-		}
-		else if(event.getKeyCode() == KeyEvent.VK_LEFT){
+        } else if (keyCode == KeyEvent.VK_LEFT) {
             action = ButtonAction.M_LEFT;
-		}
-		else if(event.getKeyCode() == KeyEvent.VK_ENTER){
+        } else if (keyCode == KeyEvent.VK_ENTER) {
             action = ButtonAction.START;
-		}
-		else if(event.getKeyCode() == KeyEvent.VK_ESCAPE){
+        } else if (keyCode == KeyEvent.VK_ESCAPE) {
             action = ButtonAction.PAUSE_RESUME;
-		}
-
-        System.out.println("Given input: " + action);
-        System.out.println("Engine status : " + engine.getGameStatus());
+        }
 
         analyzeInput(action);
-        System.out.println("Engine status : " + engine.getGameStatus());
     }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-        updateTime();
-        engine.gameLoop();
-	}
+    @Override
+    public void keyReleased(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        analyzeInput(ButtonAction.ACTION_COMPLETED);
+    }
 
-	private void analyzeInput(ButtonAction action){
-        if(action == ButtonAction.START){
+    private void analyzeInput(ButtonAction action) {
+        if (action == ButtonAction.START) {
             startGame();
         }
-        else if(action == ButtonAction.PAUSE_RESUME){
-		    pauseOrResumeGame();
+        else if (action == ButtonAction.PAUSE_RESUME) {
+            pauseOrResumeGame();
         }
-        else if(action != ButtonAction.NO_ACTION){
-            engine.analyzeInput(action);
+        else{
+            engine.notifyInput(action);
         }
-	}
-
-	private void startGame(){
-        if(engine.getGameStatus() == GameStatus.START_SCREEN) {
-            engine.setGameStatus(GameStatus.RUNNING);
-            timer.start();
-        }
-	}
-
-	private void pauseOrResumeGame(){
-	    if(engine.getGameStatus() == GameStatus.RUNNING){
-            engine.setGameStatus(GameStatus.PAUSED);
-            timer.stop();
-        }
-        else if(engine.getGameStatus() == GameStatus.PAUSED){
-            engine.setGameStatus(GameStatus.RUNNING);
-            timer.start();
-        }
-	}
-
-	private void updateTime(){
-        remainingTime = remainingTime - 1/(double)FPS;
     }
 
-	double getRemainingTime() {
-		return remainingTime;
-	}
+    private void startGame() {
 
-	void gameOver() {
-		engine.setGameStatus(GameStatus.GAME_OVER);
-		timer.stop();
-	}
+    }
 
-	@Override
-	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+    private void pauseOrResumeGame() {
 
-	}
+    }
 
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void keyTyped(KeyEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 }

@@ -1,49 +1,133 @@
 package model.hero;
 
+import manager.Camera;
+import view.Animation;
 import model.GameObject;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.awt.image.BufferedImage;
 
-public class Mario extends GameObject{
+public abstract class Mario extends GameObject{
 
-    private Set<MarioForm> forms;
+    private int remainingLives;
+    private int coins;
+    private int points;
+    private double invincibilityTimer;
+    private boolean strong, shootFire, invincible;
+    private Animation marioAnimation;
+    private boolean toRight = true;
 
-    public Mario(){
-        forms = new HashSet<>();
-        setLocation( new Point(48*3,540));
-        setDimension( new Dimension(48, 96));
-        try{
-            setStyle( ImageIO.read(new File("./src/media/mario/super-mario.png")));
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    public Mario(double x, double y, BufferedImage[] leftFrames, BufferedImage[] rightFrames){
+        super(x, y, null);
+        setDimension(48,96);
 
-    public Set<MarioForm> getForms() {
-        return forms;
-    }
+        remainingLives = 3;
+        points = 0;
+        coins = 0;
+        invincibilityTimer = 0;
 
-    public void setForms(Set<MarioForm> forms) {
-        this.forms = forms;
-    }
-
-    public void addForm(MarioForm formToAdd){
-        forms.add(formToAdd);
-    }
-
-    public void removeForm(MarioForm formToRemove){
-        forms.remove(formToRemove);
+        marioAnimation = new Animation(leftFrames, rightFrames);
+        setStyle(marioAnimation.getRightFrames()[1]);
     }
 
     @Override
-    public void draw() {
+    public void draw(Graphics g){
+        if((isJumping() || isFalling()) && toRight){
+            setStyle(marioAnimation.getRightFrames()[0]);
+        }
+        else if(isJumping() || isFalling()){
+            setStyle(marioAnimation.getLeftFrames()[0]);
+        }
+        else if(getVelX() != 0){
+            setStyle(marioAnimation.animate(5, toRight));
+        }
+        else {
+            if(toRight){
+                setStyle(marioAnimation.getRightFrames()[1]);
+            }
+            else
+                setStyle(marioAnimation.getLeftFrames()[1]);
+        }
+        super.draw(g);
+    }
 
+    public int getRemainingLives() {
+        return remainingLives;
+    }
+
+    public void setRemainingLives(int remainingLives) {
+        this.remainingLives = remainingLives;
+    }
+
+    public double getInvincibilityTimer() {
+        return invincibilityTimer;
+    }
+
+    public void setInvincibilityTimer(double invincibilityTimer) {
+        this.invincibilityTimer = invincibilityTimer;
+    }
+
+    public boolean isStrong() {
+        return strong;
+    }
+
+    public void setStrong(boolean strong) {
+        this.strong = strong;
+    }
+
+    public boolean isShootFire() {
+        return shootFire;
+    }
+
+    public void setShootFire(boolean shootFire) {
+        this.shootFire = shootFire;
+    }
+
+    public boolean isInvincible() {
+        return invincible;
+    }
+
+    public void setInvincible(boolean invincible) {
+        this.invincible = invincible;
+    }
+
+    public void acquirePoints(int point){
+        points = points + point;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public int getCoins() {
+        return coins;
+    }
+
+    public void setCoins(int coins) {
+        this.coins = coins;
+    }
+
+    public void jump() {
+        if(!isJumping() && !isFalling()){
+            setJumping(true);
+            setVelY(10);
+        }
+    }
+
+    public void move(boolean toRight, Camera camera) {
+        System.out.println(camera.getX() + " - " + getX());
+
+        if(toRight){
+            setVelX(5);
+        }
+        else if(camera.getX() < getX()){
+            setVelX(-5);
+        }
+
+        this.toRight = toRight;
     }
 }

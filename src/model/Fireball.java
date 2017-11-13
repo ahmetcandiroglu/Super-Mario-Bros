@@ -1,15 +1,17 @@
 package model;
 
 
-import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Fireball extends GameObject{
 
-    public static final Dimension DIMENSION = new Dimension(5, 5);
-
     private boolean hitEnemy;
 
-    public void move(){}
+    public Fireball(double x, double y, BufferedImage style) {
+        super(x, y, style);
+        setVelX(5);
+        setDimension(16, 16);
+    }
 
     public boolean isHitEnemy() {
         return hitEnemy;
@@ -19,8 +21,5 @@ public class Fireball extends GameObject{
         this.hitEnemy = hitEnemy;
     }
 
-    @Override
-    public void draw() {
 
-    }
 }

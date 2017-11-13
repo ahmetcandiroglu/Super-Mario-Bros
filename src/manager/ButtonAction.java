@@ -8,5 +8,5 @@ public enum ButtonAction {
     FIRE,
     START,
     PAUSE_RESUME,
-    NO_ACTION
+    ACTION_COMPLETED, NO_ACTION
 }

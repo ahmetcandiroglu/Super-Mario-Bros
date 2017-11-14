@@ -1,7 +1,7 @@
 package manager;
 
 import model.brick.*;
-import model.hero.FireMario;
+import model.prize.*;
 import view.ImageLoader;
 import model.Map;
 import model.enemy.Enemy;
@@ -9,8 +9,6 @@ import model.enemy.Goomba;
 import model.enemy.KoopaTroopa;
 import model.hero.Mario;
 import model.hero.SmallMario;
-import model.prize.Coin;
-import model.prize.Prize;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -19,7 +17,7 @@ class MapCreator {
 
     private ImageLoader imageLoader;
 
-    private BufferedImage backgroundImage, mario;
+    private BufferedImage backgroundImage;
     private BufferedImage superMushroom, oneUpMushroom, fireFlower, coin;
     private BufferedImage ordinaryBrick, surpriseBrick, groundBrick, pipe;
     private BufferedImage goomba, koopa;
@@ -32,7 +30,6 @@ class MapCreator {
         BufferedImage marioForms = imageLoader.loadImage("/mario-forms.png");
 
         this.backgroundImage = imageLoader.loadImage("/background.png");
-        this.mario = imageLoader.getSubImage(marioForms, 2, 5, 52, 48);
         this.superMushroom = imageLoader.getSubImage(sprite, 2, 5, 48, 48);
         this.oneUpMushroom= imageLoader.getSubImage(sprite, 3, 5, 48, 48);
         this.fireFlower= imageLoader.getSubImage(sprite, 4, 5, 48, 48);
@@ -47,8 +44,8 @@ class MapCreator {
 
     Map createMap(String mapPath, double timeLimit) {
         BufferedImage mapImage = imageLoader.loadImage("/map.png");
-        BufferedImage[] leftFrames = imageLoader.getLeftFrames(2);
-        BufferedImage[] rightFrames = imageLoader.getRightFrames(2);
+        BufferedImage[] leftFrames = imageLoader.getLeftFrames(0);
+        BufferedImage[] rightFrames = imageLoader.getRightFrames(0);
 
         if (mapImage == null) {
             System.out.println("Given path is invalid...");
@@ -71,34 +68,36 @@ class MapCreator {
             for (int y = 0; y < mapImage.getHeight(); y++) {
 
                 int currentPixel = mapImage.getRGB(x, y);
-                Prize prize = new Coin(x, y, this.coin, 50);
+                int xLocation = x*pixelMultiplier;
+                int yLocation = y*pixelMultiplier;
 
                 if (currentPixel == ordinaryBrick) {
-                    Brick brick = new OrdinaryBrick(x*pixelMultiplier, y*pixelMultiplier, this.ordinaryBrick);
+                    Brick brick = new OrdinaryBrick(xLocation, yLocation, this.ordinaryBrick);
                     createdMap.addBrick(brick);
                 }
                 else if (currentPixel == surpriseBrick) {
-                    Brick brick = new SurpriseBrick(x*pixelMultiplier, y*pixelMultiplier, this.surpriseBrick, prize);
+                    Prize prize = generateRandomPrize(xLocation, yLocation);
+                    Brick brick = new SurpriseBrick(xLocation, yLocation, this.surpriseBrick, prize);
                     createdMap.addBrick(brick);
                 }
                 else if (currentPixel == pipe) {
-                    Brick brick = new Pipe(x*pixelMultiplier, y*pixelMultiplier, this.pipe);
+                    Brick brick = new Pipe(xLocation, yLocation, this.pipe);
                     createdMap.addGroundBrick(brick);
                 }
                 else if (currentPixel == groundBrick) {
-                    Brick brick = new GroundBrick(x*pixelMultiplier, y*pixelMultiplier, this.groundBrick);
+                    Brick brick = new GroundBrick(xLocation, yLocation, this.groundBrick);
                     createdMap.addGroundBrick(brick);
                 }
                 else if (currentPixel == goomba) {
-                    Enemy enemy = new Goomba(x*pixelMultiplier, y*pixelMultiplier, this.goomba);
+                    Enemy enemy = new Goomba(xLocation, yLocation, this.goomba);
                     createdMap.addEnemy(enemy);
                 }
                 else if (currentPixel == koopa) {
-                    Enemy enemy = new KoopaTroopa(x*pixelMultiplier, y*pixelMultiplier, this.koopa);
+                    Enemy enemy = new KoopaTroopa(xLocation, yLocation, this.koopa);
                     createdMap.addEnemy(enemy);
                 }
                 else if (currentPixel == mario) {
-                    Mario marioObject = new FireMario(x*pixelMultiplier, y*pixelMultiplier, leftFrames, rightFrames);
+                    Mario marioObject = new SmallMario(xLocation, yLocation, leftFrames, rightFrames);
                     createdMap.setMario(marioObject);
                 }
             }
@@ -106,6 +105,26 @@ class MapCreator {
 
         System.out.println("Map is created..");
         return createdMap;
+    }
+
+    private Prize generateRandomPrize(double x, double y){
+        Prize generated = null;
+        int random = (int)(Math.random() * 6);
+
+        if(random == 0){ //super mushroom
+            generated = new SuperMushroom(x, y, this.superMushroom);
+        }
+        else if(random == 1){ //fire flower
+            generated = new FireFlower(x, y, this.fireFlower);
+        }
+        else if(random == 2){ //one up mushroom
+            generated = new OneUpMushroom(x, y, this.oneUpMushroom);
+        }
+        else{ //coin
+            generated = new Coin(x, y, this.coin, 50);
+        }
+
+        return generated;
     }
 
 

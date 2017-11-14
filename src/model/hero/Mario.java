@@ -1,8 +1,10 @@
 package model.hero;
 
 import manager.Camera;
+import model.enemy.Enemy;
 import view.Animation;
 import model.GameObject;
+import view.ImageLoader;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -119,8 +121,6 @@ public abstract class Mario extends GameObject{
     }
 
     public void move(boolean toRight, Camera camera) {
-        System.out.println(camera.getX() + " - " + getX());
-
         if(toRight){
             setVelX(5);
         }
@@ -129,5 +129,21 @@ public abstract class Mario extends GameObject{
         }
 
         this.toRight = toRight;
+    }
+
+    public Mario onTouchEnemy(ImageLoader imageLoader) {
+        BufferedImage[] leftFrames = imageLoader.getLeftFrames(0);
+        BufferedImage[] rightFrames = imageLoader.getRightFrames(0);
+
+        Mario newMario = new SmallMario(this.getX(), this.getY(),leftFrames, rightFrames);
+        newMario.setRemainingLives(this.getRemainingLives());
+        newMario.setPoints(this.getPoints());
+        newMario.setCoins(this.getCoins());
+
+        return newMario;
+    }
+
+    public void acquireCoin() {
+        coins++;
     }
 }

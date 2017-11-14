@@ -1,9 +1,11 @@
 package model.prize;
 
+import model.Map;
 import model.hero.FireMario;
 import model.hero.Mario;
 import model.hero.SmallMario;
 import model.hero.SuperMario;
+import view.ImageLoader;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -14,33 +16,28 @@ public class FireFlower extends BoostItem {
 
     public FireFlower(double x, double y, BufferedImage style) {
         super(x, y, style);
+        setPoint(150);
     }
 
     @Override
-    public Mario onTouch(Mario mario) {
-        /*mario.acquirePoints(getPoint());
+    public void onTouch(Map gameMap) {
+        Mario mario = gameMap.getMario();
+        mario.acquirePoints(getPoint());
+        ImageLoader imageLoader = new ImageLoader();
 
-        if(mario instanceof SmallMario || mario instanceof SuperMario){
-            int remainingLives = mario.getRemainingLives();
-            int points = mario.getPoints();
+        if(!(mario instanceof FireMario) ){
+            Mario newMario = new FireMario(
+                    mario.getX(),
+                    mario.getY(),
+                    imageLoader.getLeftFrames(2),
+                    imageLoader.getRightFrames(2));
 
-            Mario newMario = new FireMario(mario.getX(), mario.getY(), loadFireStyle());
-            newMario.setRemainingLives(remainingLives);
-            newMario.setPoints(points);
-            return newMario;
+            newMario.setRemainingLives(mario.getRemainingLives());
+            newMario.setPoints(mario.getPoints());
+            newMario.setCoins(mario.getCoins());
+            gameMap.setMario(newMario);
         }
-
-        return mario;*/
-        return null;
     }
 
-    private BufferedImage loadFireStyle(){
-        BufferedImage style = null;
-        try {
-            style = ImageIO.read( new File("./src/media/mario/fire-mario.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return style;
-    }
+
 }

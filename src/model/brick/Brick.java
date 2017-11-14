@@ -1,6 +1,8 @@
 package model.brick;
 
 import model.GameObject;
+import model.Map;
+import model.prize.Prize;
 
 import java.awt.image.BufferedImage;
 
@@ -31,8 +33,9 @@ public abstract class Brick extends GameObject{
         this.empty = empty;
     }
 
-    @Override
-    public void updateLocation() {
+    public void reveal(Map gameMap){}
 
+    public Prize getPrize() {
+        return null;
     }
 }

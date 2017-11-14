@@ -1,6 +1,7 @@
 package model.prize;
 
 import model.GameObject;
+import model.Map;
 import model.hero.Mario;
 
 import java.awt.*;
@@ -17,7 +18,7 @@ public abstract class BoostItem extends GameObject implements Prize{
         setDimension(48, 48);
     }
 
-    public abstract Mario onTouch(Mario mario);
+    public abstract void onTouch(Map gameMap);
 
     public boolean isRevealed() {
         return revealed;
@@ -48,5 +49,11 @@ public abstract class BoostItem extends GameObject implements Prize{
 
     public void setPoint(int point) {
         this.point = point;
+    }
+
+    @Override
+    public void reveal(Map gameMap){
+        setY(getY()-48);
+        revealed = true;
     }
 }

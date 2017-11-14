@@ -1,6 +1,7 @@
 package model.prize;
 
 import model.GameObject;
+import model.Map;
 import model.hero.Mario;
 
 import java.awt.*;
@@ -48,5 +49,10 @@ public abstract class BoostItem extends GameObject implements Prize{
 
     public void setPoint(int point) {
         this.point = point;
+    }
+
+    @Override
+    public void reveal(Map gameMap){
+        revealed = true;
     }
 }

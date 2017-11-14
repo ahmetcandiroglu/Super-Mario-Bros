@@ -1,6 +1,8 @@
 package model.prize;
 
 import model.GameObject;
+import model.Map;
+import model.hero.Mario;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -9,14 +11,15 @@ import java.awt.image.BufferedImage;
 public class Coin extends GameObject implements Prize{
 
     private int point;
-
     private boolean revealed;
+    private int revealBoundary;
 
     public Coin(double x, double y, BufferedImage style, int point){
         super(x, y, style);
         this.point = point;
         revealed = false;
         setDimension(30, 42);
+        revealBoundary = (int)getY() - getDimension().height / 2;
     }
 
     @Override
@@ -25,12 +28,29 @@ public class Coin extends GameObject implements Prize{
     }
 
     @Override
-    public void updateLocation(){}
+    public void reveal(Map gameMap) {
+        Mario mario = gameMap.getMario();
+        mario.acquirePoints(getPoint());
+        mario.acquireCoin();
+        revealed = true;
+    }
+
+    @Override
+    public void updateLocation(){
+        if(revealed){
+            setY(getY() - 2);
+        }
+    }
 
     @Override
     public void draw(Graphics g){
         if(revealed){
+            System.out.println("draw");
             g.drawImage(getStyle(), (int)getX(), (int)getY(), null);
         }
+    }
+
+    public int getRevealBoundary() {
+        return revealBoundary;
     }
 }

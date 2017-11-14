@@ -2,6 +2,7 @@ package manager;
 
 import model.brick.*;
 import model.hero.FireMario;
+import model.hero.SuperMario;
 import view.ImageLoader;
 import model.Map;
 import model.enemy.Enemy;
@@ -47,8 +48,8 @@ class MapCreator {
 
     Map createMap(String mapPath, double timeLimit) {
         BufferedImage mapImage = imageLoader.loadImage("/map.png");
-        BufferedImage[] leftFrames = imageLoader.getLeftFrames(2);
-        BufferedImage[] rightFrames = imageLoader.getRightFrames(2);
+        BufferedImage[] leftFrames = imageLoader.getLeftFrames(1);
+        BufferedImage[] rightFrames = imageLoader.getRightFrames(1);
 
         if (mapImage == null) {
             System.out.println("Given path is invalid...");
@@ -71,7 +72,7 @@ class MapCreator {
             for (int y = 0; y < mapImage.getHeight(); y++) {
 
                 int currentPixel = mapImage.getRGB(x, y);
-                Prize prize = new Coin(x, y, this.coin, 50);
+                Prize prize = new Coin(x*pixelMultiplier, y*pixelMultiplier, this.coin, 50);
 
                 if (currentPixel == ordinaryBrick) {
                     Brick brick = new OrdinaryBrick(x*pixelMultiplier, y*pixelMultiplier, this.ordinaryBrick);
@@ -79,6 +80,7 @@ class MapCreator {
                 }
                 else if (currentPixel == surpriseBrick) {
                     Brick brick = new SurpriseBrick(x*pixelMultiplier, y*pixelMultiplier, this.surpriseBrick, prize);
+                    createdMap.addCoin(prize);
                     createdMap.addBrick(brick);
                 }
                 else if (currentPixel == pipe) {
@@ -98,7 +100,7 @@ class MapCreator {
                     createdMap.addEnemy(enemy);
                 }
                 else if (currentPixel == mario) {
-                    Mario marioObject = new FireMario(x*pixelMultiplier, y*pixelMultiplier, leftFrames, rightFrames);
+                    Mario marioObject = new SuperMario(x*pixelMultiplier, y*pixelMultiplier, leftFrames, rightFrames);
                     createdMap.setMario(marioObject);
                 }
             }

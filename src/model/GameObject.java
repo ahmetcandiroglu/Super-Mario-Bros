@@ -33,17 +33,17 @@ public abstract class GameObject {
         if(style != null){
             g.drawImage(style, (int)x, (int)y, null);
         }
-        Graphics2D g2 = (Graphics2D)g;
+
+        /*Graphics2D g2 = (Graphics2D)g;
         g2.setColor(Color.WHITE);
 
         g2.draw(getTopBounds());
         g2.draw(getBottomBounds());
         g2.draw(getRightBounds());
-        g2.draw(getLeftBounds());
+        g2.draw(getLeftBounds());*/
     }
 
     public void updateLocation() {
-        System.out.println(velY);
         if(jumping && velY <= 0){
             jumping = false;
             falling = true;

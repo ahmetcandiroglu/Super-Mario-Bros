@@ -5,10 +5,12 @@ import model.enemy.Enemy;
 import model.hero.Mario;
 import model.prize.BoostItem;
 import model.prize.Coin;
+import model.prize.Prize;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Map {
 
@@ -115,9 +117,16 @@ public class Map {
 
     public void drawMap(Graphics2D g2){
         drawBackground(g2);
+        drawCoins(g2);
         drawBricks(g2);
         drawEnemies(g2);
         drawMario(g2);
+    }
+
+    private void drawCoins(Graphics2D g2) {
+        for(Coin coin : coins){
+            coin.draw(g2);
+        }
     }
 
     private void drawBackground(Graphics2D g2){
@@ -146,6 +155,17 @@ public class Map {
 
     public void updateLocations() {
         mario.updateLocation();
+        for(Enemy enemy : enemies){
+            enemy.updateLocation();
+        }
+
+        for(Iterator<Coin> coinIterator = coins.iterator(); coinIterator.hasNext();){
+            Coin coin = coinIterator.next();
+            coin.updateLocation();
+            if(coin.getY() <= coin.getRevealBoundary()){
+                coinIterator.remove();
+            }
+        }
     }
 
     public ArrayList<Brick> getAllBricks() {
@@ -159,5 +179,9 @@ public class Map {
 
     public double getBottomBorder() {
         return bottomBorder;
+    }
+
+    public void addCoin(Prize prize) {
+        coins.add((Coin)prize);
     }
 }

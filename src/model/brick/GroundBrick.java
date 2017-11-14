@@ -9,4 +9,5 @@ public class GroundBrick extends Brick{
         setBreakable(false);
         setEmpty(false);
     }
+
 }

@@ -1,5 +1,7 @@
 package model.brick;
 
+import model.Map;
+import model.hero.Mario;
 import model.prize.Prize;
 
 import java.awt.image.BufferedImage;
@@ -13,5 +15,13 @@ public class SurpriseBrick extends Brick{
         setBreakable(false);
         setEmpty(false);
         this.prize = prize;
+    }
+
+    @Override
+    public void reveal(Map gameMap){
+        if(prize != null)
+            prize.reveal(gameMap);
+
+        this.prize = null;
     }
 }

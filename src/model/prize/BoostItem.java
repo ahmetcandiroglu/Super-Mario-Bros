@@ -18,7 +18,7 @@ public abstract class BoostItem extends GameObject implements Prize{
         setDimension(48, 48);
     }
 
-    public abstract Mario onTouch(Mario mario);
+    public abstract void onTouch(Map gameMap);
 
     public boolean isRevealed() {
         return revealed;
@@ -53,7 +53,7 @@ public abstract class BoostItem extends GameObject implements Prize{
 
     @Override
     public void reveal(Map gameMap){
-        revealed = true;
         setY(getY()-48);
+        revealed = true;
     }
 }

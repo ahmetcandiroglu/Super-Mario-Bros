@@ -17,7 +17,7 @@ class MapCreator {
 
     private ImageLoader imageLoader;
 
-    private BufferedImage backgroundImage, mario;
+    private BufferedImage backgroundImage;
     private BufferedImage superMushroom, oneUpMushroom, fireFlower, coin;
     private BufferedImage ordinaryBrick, surpriseBrick, groundBrick, pipe;
     private BufferedImage goomba, koopa;
@@ -30,7 +30,6 @@ class MapCreator {
         BufferedImage marioForms = imageLoader.loadImage("/mario-forms.png");
 
         this.backgroundImage = imageLoader.loadImage("/background.png");
-        this.mario = imageLoader.getSubImage(marioForms, 2, 5, 52, 48);
         this.superMushroom = imageLoader.getSubImage(sprite, 2, 5, 48, 48);
         this.oneUpMushroom= imageLoader.getSubImage(sprite, 3, 5, 48, 48);
         this.fireFlower= imageLoader.getSubImage(sprite, 4, 5, 48, 48);

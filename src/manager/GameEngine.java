@@ -129,6 +129,7 @@ public class GameEngine implements Runnable {
         checkRightCollisions(mario, bricks, enemies);
         checkLeftCollisions(mario, bricks, enemies);
         checkEnemyCollisions(bricks, enemies);
+        checkPrizeContact(mario, revealedPrizes);
         checkPrizeCollision(revealedPrizes, bricks);
     }
 
@@ -303,6 +304,22 @@ public class GameEngine implements Runnable {
 
             }
         }
+    }
+
+    private void checkPrizeContact(Mario mario, ArrayList<Prize> prizes){
+        Rectangle marioBounds = mario.getBounds();
+
+        for(Iterator<Prize> prizeIterator = prizes.iterator(); prizeIterator.hasNext();){
+            Prize prize = prizeIterator.next();
+            if(prize instanceof BoostItem){
+                Rectangle prizeBounds = ((BoostItem) prize).getBounds();
+                if(prizeBounds.intersects(marioBounds)){
+                    ((BoostItem) prize).onTouch(gameMap);
+                    prizeIterator.remove();
+                }
+            }
+        }
+
     }
 
     public void notifyInput(ButtonAction input) {

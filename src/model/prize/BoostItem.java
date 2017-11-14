@@ -54,5 +54,6 @@ public abstract class BoostItem extends GameObject implements Prize{
     @Override
     public void reveal(Map gameMap){
         revealed = true;
+        setY(getY()-48);
     }
 }

@@ -19,9 +19,17 @@ public class SurpriseBrick extends Brick{
 
     @Override
     public void reveal(Map gameMap){
-        if(prize != null)
+        if(prize != null){
+            gameMap.addRevealedPrize(prize);
             prize.reveal(gameMap);
+        }
 
+        setEmpty(true);
         this.prize = null;
+    }
+
+    @Override
+    public Prize getPrize(){
+        return prize;
     }
 }

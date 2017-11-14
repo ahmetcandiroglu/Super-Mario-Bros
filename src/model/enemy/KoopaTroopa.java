@@ -7,7 +7,7 @@ public class KoopaTroopa extends Enemy{
 
     public KoopaTroopa(double x, double y, BufferedImage style) {
         super(x, y, style);
-        setVelX(4);
+        setVelX(3);
         setDimension(48, 64);
     }
 

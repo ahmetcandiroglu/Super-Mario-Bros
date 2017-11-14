@@ -19,7 +19,7 @@ public class Coin extends GameObject implements Prize{
         this.point = point;
         revealed = false;
         setDimension(30, 42);
-        revealBoundary = (int)getY() - getDimension().height / 2;
+        revealBoundary = (int)getY() - getDimension().height;
     }
 
     @Override
@@ -38,14 +38,13 @@ public class Coin extends GameObject implements Prize{
     @Override
     public void updateLocation(){
         if(revealed){
-            setY(getY() - 2);
+            setY(getY() - 5);
         }
     }
 
     @Override
     public void draw(Graphics g){
         if(revealed){
-            System.out.println("draw");
             g.drawImage(getStyle(), (int)getX(), (int)getY(), null);
         }
     }

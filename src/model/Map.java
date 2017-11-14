@@ -19,9 +19,8 @@ public class Map {
     private ArrayList<Brick> bricks = new ArrayList<>();
     private ArrayList<Enemy> enemies = new ArrayList<>();
     private ArrayList<Brick> groundBricks = new ArrayList<>();
+    private ArrayList<Prize> revealedPrizes = new ArrayList<>();
     private ArrayList<Fireball> fireballs = new ArrayList<>();
-    private ArrayList<Coin> coins = new ArrayList<>();
-    private ArrayList<BoostItem> boostItems = new ArrayList<>();
     private BufferedImage backgroundImage;
     private double bottomBorder = 720 - 96;
 
@@ -79,20 +78,12 @@ public class Map {
         this.fireballs = fireballs;
     }
 
-    public ArrayList<Coin> getCoins() {
-        return coins;
+    public ArrayList<Prize> getRevealedPrizes() {
+        return revealedPrizes;
     }
 
-    public void setCoins(ArrayList<Coin> coins) {
-        this.coins = coins;
-    }
-
-    public ArrayList<BoostItem> getBoostItems() {
-        return boostItems;
-    }
-
-    public void setBoostItems(ArrayList<BoostItem> boostItems) {
-        this.boostItems = boostItems;
+    public void setRevealedPrizes(ArrayList<Prize> revealedPrizes) {
+        this.revealedPrizes = revealedPrizes;
     }
 
     public BufferedImage getBackgroundImage() {
@@ -117,15 +108,20 @@ public class Map {
 
     public void drawMap(Graphics2D g2){
         drawBackground(g2);
-        drawCoins(g2);
+        drawPrizes(g2);
         drawBricks(g2);
         drawEnemies(g2);
         drawMario(g2);
     }
 
-    private void drawCoins(Graphics2D g2) {
-        for(Coin coin : coins){
-            coin.draw(g2);
+    private void drawPrizes(Graphics2D g2) {
+        for(Prize prize : revealedPrizes){
+            if(prize instanceof Coin){
+                ((Coin) prize).draw(g2);
+            }
+            else if(prize instanceof  BoostItem){
+                ((BoostItem) prize).draw(g2);
+            }
         }
     }
 
@@ -159,11 +155,16 @@ public class Map {
             enemy.updateLocation();
         }
 
-        for(Iterator<Coin> coinIterator = coins.iterator(); coinIterator.hasNext();){
-            Coin coin = coinIterator.next();
-            coin.updateLocation();
-            if(coin.getY() <= coin.getRevealBoundary()){
-                coinIterator.remove();
+        for(Iterator<Prize> prizeIterator = revealedPrizes.iterator(); prizeIterator.hasNext();){
+            Prize prize = prizeIterator.next();
+            if(prize instanceof Coin){
+                ((Coin) prize).updateLocation();
+                if(((Coin) prize).getRevealBoundary() > ((Coin) prize).getY()){
+                    prizeIterator.remove();
+                }
+            }
+            else if(prize instanceof BoostItem){
+                ((BoostItem) prize).updateLocation();
             }
         }
     }
@@ -181,7 +182,7 @@ public class Map {
         return bottomBorder;
     }
 
-    public void addCoin(Prize prize) {
-        coins.add((Coin)prize);
+    public void addRevealedPrize(Prize prize) {
+        revealedPrizes.add(prize);
     }
 }

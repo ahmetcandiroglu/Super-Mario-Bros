@@ -2,6 +2,7 @@ package model.brick;
 
 import model.GameObject;
 import model.Map;
+import model.prize.Prize;
 
 import java.awt.image.BufferedImage;
 
@@ -33,4 +34,8 @@ public abstract class Brick extends GameObject{
     }
 
     public void reveal(Map gameMap){}
+
+    public Prize getPrize() {
+        return null;
+    }
 }

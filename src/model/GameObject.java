@@ -140,6 +140,10 @@ public abstract class GameObject {
         return new Rectangle((int)x + 3*dimension.width/4, (int)y + dimension.height/4, dimension.width/4, dimension.height/2);
     }
 
+    public Rectangle getBounds(){
+        return new Rectangle((int)x, (int)y, dimension.width, dimension.height);
+    }
+
     public boolean isFalling() {
         return falling;
     }

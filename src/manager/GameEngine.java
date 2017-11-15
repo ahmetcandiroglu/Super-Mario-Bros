@@ -1,5 +1,6 @@
 package manager;
 
+import model.Fireball;
 import model.brick.Brick;
 import model.enemy.Enemy;
 import model.hero.Mario;
@@ -30,8 +31,8 @@ public class GameEngine implements Runnable {
         init();
     }
 
-    private synchronized void start(){
-        if(isRunning)
+    private synchronized void start() {
+        if (isRunning)
             return;
 
         isRunning = true;
@@ -71,14 +72,16 @@ public class GameEngine implements Runnable {
         int updates = 0;
         int frames = 0;
 
-        while(isRunning && !thread.isInterrupted()) {
+        while (isRunning && !thread.isInterrupted()) {
 
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
             while (delta >= 1) {
-                tick();
-                updates++;
+                if(gameStatus == GameStatus.RUNNING){
+                    gameLoop();
+                    updates++;
+                }
                 delta--;
             }
             render();
@@ -97,20 +100,21 @@ public class GameEngine implements Runnable {
         uiManager.repaint();
     }
 
-    private void tick() {
-        updateCamera();
+    private void gameLoop() {
         updateLocations();
         checkCollisions();
+        updateCamera();
 
-        if(isGameOver())
-            thread.interrupt();
+        if (isGameOver()){
+            gameStatus = GameStatus.GAME_OVER;
+        }
     }
 
     private void updateCamera() {
         double marioVelocityX = gameMap.getMario().getVelX();
 
-        if( marioVelocityX > 0 && gameMap.getMario().getX() - 600 > camera.getX()){
-            camera.setX( camera.getX() + marioVelocityX);
+        if (marioVelocityX > 0 && gameMap.getMario().getX() - 600 > camera.getX()) {
+            camera.setX(camera.getX() + marioVelocityX);
         }
     }
 
@@ -118,46 +122,48 @@ public class GameEngine implements Runnable {
         gameMap.updateLocations();
     }
 
-    private void checkCollisions(){
+    private void checkCollisions() {
         Mario mario = gameMap.getMario();
         ArrayList<Brick> bricks = gameMap.getAllBricks();
         ArrayList<Enemy> enemies = gameMap.getEnemies();
         ArrayList<Prize> revealedPrizes = gameMap.getRevealedPrizes();
+        ArrayList<Fireball> fireballs = gameMap.getFireballs();
 
         checkBottomCollisions(mario, bricks, enemies);
         checkTopCollisions(mario, bricks, enemies);
         checkRightCollisions(mario, bricks, enemies);
         checkLeftCollisions(mario, bricks, enemies);
         checkEnemyCollisions(bricks, enemies);
+        checkFireballContact(mario, fireballs, enemies);
         checkPrizeContact(mario, revealedPrizes);
         checkPrizeCollision(revealedPrizes, bricks);
     }
 
-    private void checkBottomCollisions(Mario mario, ArrayList<Brick> bricks, ArrayList<Enemy> enemies){
+    private void checkBottomCollisions(Mario mario, ArrayList<Brick> bricks, ArrayList<Enemy> enemies) {
         Rectangle marioBottomBounds = mario.getBottomBounds();
 
-        if(!mario.isJumping())
+        if (!mario.isJumping())
             mario.setFalling(true);
 
-        for(Brick brick: bricks){
+        for (Brick brick : bricks) {
             Rectangle brickTopBounds = brick.getTopBounds();
-            if(marioBottomBounds.intersects(brickTopBounds)){
+            if (marioBottomBounds.intersects(brickTopBounds)) {
                 mario.setY(brick.getY() - mario.getDimension().height + 1);
                 mario.setFalling(false);
                 mario.setVelY(0);
             }
         }
 
-        for(Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext();){
+        for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
             Enemy enemy = iterator.next();
             Rectangle enemyTopBounds = enemy.getTopBounds();
-            if(marioBottomBounds.intersects(enemyTopBounds)){
+            if (marioBottomBounds.intersects(enemyTopBounds)) {
                 mario.acquirePoints(100);
                 iterator.remove();
             }
         }
 
-        if(mario.getY() + mario.getDimension().height >= gameMap.getBottomBorder()){
+        if (mario.getY() + mario.getDimension().height >= gameMap.getBottomBorder()) {
             mario.setY(gameMap.getBottomBorder() - mario.getDimension().height);
             mario.setFalling(false);
             mario.setVelY(0);
@@ -167,9 +173,9 @@ public class GameEngine implements Runnable {
     private void checkTopCollisions(Mario mario, ArrayList<Brick> bricks, ArrayList<Enemy> enemies) {
         Rectangle marioTopBounds = mario.getTopBounds();
 
-        for(Brick brick: bricks){
+        for (Brick brick : bricks) {
             Rectangle brickBottomBounds = brick.getBottomBounds();
-            if(marioTopBounds.intersects(brickBottomBounds)){
+            if (marioTopBounds.intersects(brickBottomBounds)) {
                 mario.setVelY(0);
                 mario.setY(brick.getY() + brick.getDimension().height);
                 brick.reveal(gameMap);
@@ -180,18 +186,18 @@ public class GameEngine implements Runnable {
     private void checkRightCollisions(Mario mario, ArrayList<Brick> bricks, ArrayList<Enemy> enemies) {
         Rectangle marioRightBounds = mario.getRightBounds();
 
-        for(Brick brick: bricks){
+        for (Brick brick : bricks) {
             Rectangle brickLeftBounds = brick.getLeftBounds();
-            if(marioRightBounds.intersects(brickLeftBounds)){
+            if (marioRightBounds.intersects(brickLeftBounds)) {
                 mario.setVelX(0);
                 mario.setX(brick.getX() - mario.getDimension().width);
             }
         }
 
-        for(Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext();){
+        for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
             Enemy enemy = iterator.next();
             Rectangle enemyLeftBounds = enemy.getLeftBounds();
-            if(marioRightBounds.intersects(enemyLeftBounds)){
+            if (marioRightBounds.intersects(enemyLeftBounds)) {
                 gameMap.setMario(mario.onTouchEnemy(imageLoader));
                 iterator.remove();
             }
@@ -201,104 +207,103 @@ public class GameEngine implements Runnable {
     private void checkLeftCollisions(Mario mario, ArrayList<Brick> bricks, ArrayList<Enemy> enemies) {
         Rectangle marioLeftBounds = mario.getLeftBounds();
 
-        for(Brick brick: bricks){
+        for (Brick brick : bricks) {
             Rectangle brickRightBounds = brick.getRightBounds();
-            if(marioLeftBounds.intersects(brickRightBounds)){
+            if (marioLeftBounds.intersects(brickRightBounds)) {
                 mario.setVelX(0);
                 mario.setX(brick.getX() + brick.getDimension().width);
             }
         }
 
-        for(Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext();){
+        for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
             Enemy enemy = iterator.next();
             Rectangle enemyRightBounds = enemy.getRightBounds();
-            if(marioLeftBounds.intersects(enemyRightBounds)){
+            if (marioLeftBounds.intersects(enemyRightBounds)) {
                 gameMap.setMario(mario.onTouchEnemy(imageLoader));
                 iterator.remove();
             }
         }
 
-        if(mario.getX() <= camera.getX() && mario.getVelX() < 0){
+        if (mario.getX() <= camera.getX() && mario.getVelX() < 0) {
             mario.setVelX(0);
             mario.setX(camera.getX());
         }
     }
 
-    private void checkEnemyCollisions(ArrayList<Brick> bricks, ArrayList<Enemy> enemies){
+    private void checkEnemyCollisions(ArrayList<Brick> bricks, ArrayList<Enemy> enemies) {
 
-        for(Enemy enemy: enemies){
+        for (Enemy enemy : enemies) {
             boolean standsOnBrick = false;
 
-            for(Brick brick: bricks){
+            for (Brick brick : bricks) {
                 Rectangle enemyBounds = enemy.getLeftBounds();
                 Rectangle brickBounds = brick.getRightBounds();
 
                 Rectangle enemyBottomBounds = enemy.getBottomBounds();
                 Rectangle brickTopBounds = brick.getTopBounds();
 
-                if(enemy.getVelX() > 0){
+                if (enemy.getVelX() > 0) {
                     enemyBounds = enemy.getRightBounds();
                     brickBounds = brick.getLeftBounds();
                 }
 
-                if(enemyBounds.intersects(brickBounds)){
+                if (enemyBounds.intersects(brickBounds)) {
                     enemy.setVelX(-enemy.getVelX());
                 }
 
-                if(enemyBottomBounds.intersects(brickTopBounds))
+                if (enemyBottomBounds.intersects(brickTopBounds))
                     standsOnBrick = true;
             }
 
-            if(!standsOnBrick && enemy.getY() + 48 < gameMap.getBottomBorder())
+            if (!standsOnBrick && enemy.getY() + 48 < gameMap.getBottomBorder())
                 enemy.setVelX(-enemy.getVelX());
         }
     }
 
-    private void checkPrizeCollision(ArrayList<Prize> prizes, ArrayList<Brick> bricks){
-        for(Prize prize : prizes){
-            if(prize instanceof BoostItem){
+    private void checkPrizeCollision(ArrayList<Prize> prizes, ArrayList<Brick> bricks) {
+        for (Prize prize : prizes) {
+            if (prize instanceof BoostItem) {
                 BoostItem boost = (BoostItem) prize;
                 Rectangle prizeBottomBounds = boost.getBottomBounds();
                 Rectangle prizeRightBounds = boost.getRightBounds();
                 Rectangle prizeLeftBounds = boost.getLeftBounds();
                 boost.setFalling(true);
 
-                for(Brick brick: bricks){
+                for (Brick brick : bricks) {
                     Rectangle brickBounds;
 
-                    if(boost.isFalling()){
+                    if (boost.isFalling()) {
                         brickBounds = brick.getTopBounds();
 
-                        if(brickBounds.intersects(prizeBottomBounds)){
+                        if (brickBounds.intersects(prizeBottomBounds)) {
                             boost.setFalling(false);
                             boost.setVelY(0);
                             boost.setY(brick.getY() - boost.getDimension().height + 1);
-                            if(boost.getVelX() == 0)
+                            if (boost.getVelX() == 0)
                                 boost.setVelX(2);
                         }
                     }
 
-                    if(boost.getVelX() > 0){
+                    if (boost.getVelX() > 0) {
                         brickBounds = brick.getLeftBounds();
 
-                        if(brickBounds.intersects(prizeRightBounds)){
+                        if (brickBounds.intersects(prizeRightBounds)) {
                             boost.setVelX(-boost.getVelX());
                         }
-                    }
-                    else if(boost.getVelX() < 0){
+                    } else if (boost.getVelX() < 0) {
                         brickBounds = brick.getRightBounds();
 
-                        if(brickBounds.intersects(prizeLeftBounds)){
+                        if (brickBounds.intersects(prizeLeftBounds)) {
                             boost.setVelX(-boost.getVelX());
                         }
                     }
                 }
 
-                if(boost.getY() + boost.getDimension().height > gameMap.getBottomBorder()){
+                if (boost.getY() + boost.getDimension().height > gameMap.getBottomBorder()) {
                     boost.setFalling(false);
                     boost.setVelY(0);
                     boost.setY(gameMap.getBottomBorder() - boost.getDimension().height);
-                    if(boost.getVelX() == 0)
+                    if (boost.getVelX() == 0)
                         boost.setVelX(2);
                 }
 
@@ -306,14 +311,14 @@ public class GameEngine implements Runnable {
         }
     }
 
-    private void checkPrizeContact(Mario mario, ArrayList<Prize> prizes){
+    private void checkPrizeContact(Mario mario, ArrayList<Prize> prizes) {
         Rectangle marioBounds = mario.getBounds();
 
-        for(Iterator<Prize> prizeIterator = prizes.iterator(); prizeIterator.hasNext();){
+        for (Iterator<Prize> prizeIterator = prizes.iterator(); prizeIterator.hasNext(); ) {
             Prize prize = prizeIterator.next();
-            if(prize instanceof BoostItem){
+            if (prize instanceof BoostItem) {
                 Rectangle prizeBounds = ((BoostItem) prize).getBounds();
-                if(prizeBounds.intersects(marioBounds)){
+                if (prizeBounds.intersects(marioBounds)) {
                     ((BoostItem) prize).onTouch(gameMap);
                     prizeIterator.remove();
                 }
@@ -322,24 +327,45 @@ public class GameEngine implements Runnable {
 
     }
 
-    public void notifyInput(ButtonAction input) {
-        Mario mario = gameMap.getMario();
+    private void checkFireballContact(Mario mario, ArrayList<Fireball> fireballs, ArrayList<Enemy> enemies){
 
-        if(input == ButtonAction.JUMP){
-            mario.jump();
-        }
-        else if(input == ButtonAction.M_RIGHT){
-                mario.move(true, camera);
-        }
-        else if(input == ButtonAction.M_LEFT){
-            mario.move(false, camera);
-        }
-        else if(input == ButtonAction.ACTION_COMPLETED){
-            mario.setVelX(0);
+        for(Iterator<Fireball> fireballIterator = fireballs.iterator(); fireballIterator.hasNext();){
+            Fireball fireball = fireballIterator.next();
+            Rectangle fireballBounds = fireball.getBounds();
+
+            for(Iterator<Enemy> enemyIterator = enemies.iterator(); enemyIterator.hasNext();){
+                Enemy enemy = enemyIterator.next();
+                Rectangle enemyBounds = enemy.getBounds();
+
+                if(fireballBounds.intersects(enemyBounds)){
+                    mario.acquirePoints(100);
+                    fireballIterator.remove();
+                    enemyIterator.remove();
+                }
+            }
         }
     }
 
-    private boolean isGameOver(){
+    public void notifyInput(ButtonAction input) {
+        Mario mario = gameMap.getMario();
+
+        if(gameStatus != GameStatus.RUNNING)
+            return;
+
+        if (input == ButtonAction.JUMP) {
+            mario.jump();
+        } else if (input == ButtonAction.M_RIGHT) {
+            mario.move(true, camera);
+        } else if (input == ButtonAction.M_LEFT) {
+            mario.move(false, camera);
+        } else if (input == ButtonAction.ACTION_COMPLETED) {
+            mario.setVelX(0);
+        } else if (input == ButtonAction.FIRE) {
+            mario.fire(gameMap);
+        }
+    }
+
+    private boolean isGameOver() {
         return gameMap.getMario().getRemainingLives() == 0;
     }
 
@@ -360,4 +386,22 @@ public class GameEngine implements Runnable {
         new GameEngine();
     }
 
+    public void startGame() {
+        if(gameStatus != GameStatus.GAME_OVER) {
+            gameStatus = GameStatus.RUNNING;
+        }
+    }
+
+    public void pauseGame() {
+        if(gameStatus == GameStatus.RUNNING){
+            gameStatus = GameStatus.PAUSED;
+        }
+        else if(gameStatus == GameStatus.PAUSED){
+            gameStatus = GameStatus.RUNNING;
+        }
+    }
+
+    public GameStatus getGameStatus() {
+        return gameStatus;
+    }
 }

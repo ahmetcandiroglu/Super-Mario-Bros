@@ -1,6 +1,7 @@
 package model.hero;
 
 import manager.Camera;
+import model.Map;
 import model.enemy.Enemy;
 import view.Animation;
 import model.GameObject;
@@ -146,4 +147,6 @@ public abstract class Mario extends GameObject{
     public void acquireCoin() {
         coins++;
     }
+
+    public void fire(Map gameMap){}
 }

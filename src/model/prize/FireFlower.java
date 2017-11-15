@@ -39,5 +39,7 @@ public class FireFlower extends BoostItem {
         }
     }
 
+    @Override
+    public void updateLocation(){}
 
 }

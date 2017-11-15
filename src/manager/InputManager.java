@@ -29,6 +29,8 @@ public class InputManager implements KeyListener{
             action = ButtonAction.START;
         } else if (keyCode == KeyEvent.VK_ESCAPE) {
             action = ButtonAction.PAUSE_RESUME;
+        } else if (keyCode == KeyEvent.VK_SPACE){
+            action = ButtonAction.FIRE;
         }
 
         analyzeInput(action);
@@ -53,11 +55,11 @@ public class InputManager implements KeyListener{
     }
 
     private void startGame() {
-
+        engine.startGame();
     }
 
     private void pauseOrResumeGame() {
-
+        engine.pauseGame();
     }
 
     @Override

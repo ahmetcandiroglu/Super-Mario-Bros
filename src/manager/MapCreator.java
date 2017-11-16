@@ -8,7 +8,6 @@ import model.enemy.Enemy;
 import model.enemy.Goomba;
 import model.enemy.KoopaTroopa;
 import model.hero.Mario;
-import model.hero.SmallMario;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -27,7 +26,6 @@ class MapCreator {
 
         this.imageLoader = imageLoader;
         BufferedImage sprite = imageLoader.loadImage("/sprite.png");
-        BufferedImage marioForms = imageLoader.loadImage("/mario-forms.png");
 
         this.backgroundImage = imageLoader.loadImage("/background.png");
         this.superMushroom = imageLoader.getSubImage(sprite, 2, 5, 48, 48);
@@ -44,8 +42,6 @@ class MapCreator {
 
     Map createMap(String mapPath, double timeLimit) {
         BufferedImage mapImage = imageLoader.loadImage("/map.png");
-        BufferedImage[] leftFrames = imageLoader.getLeftFrames(0);
-        BufferedImage[] rightFrames = imageLoader.getRightFrames(0);
 
         if (mapImage == null) {
             System.out.println("Given path is invalid...");
@@ -97,7 +93,7 @@ class MapCreator {
                     createdMap.addEnemy(enemy);
                 }
                 else if (currentPixel == mario) {
-                    Mario marioObject = new SmallMario(xLocation, yLocation, leftFrames, rightFrames);
+                    Mario marioObject = new Mario(xLocation, yLocation);
                     createdMap.setMario(marioObject);
                 }
             }
@@ -108,8 +104,8 @@ class MapCreator {
     }
 
     private Prize generateRandomPrize(double x, double y){
-        Prize generated = null;
-        int random = 1;//(int)(Math.random() * 6);
+        Prize generated;
+        int random = (int)(Math.random() * 6);
 
         if(random == 0){ //super mushroom
             generated = new SuperMushroom(x, y, this.superMushroom);

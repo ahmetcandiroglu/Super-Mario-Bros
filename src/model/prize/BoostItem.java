@@ -10,7 +10,6 @@ import java.awt.image.BufferedImage;
 public abstract class BoostItem extends GameObject implements Prize{
 
     private boolean revealed = false;
-
     private int point;
 
     public BoostItem(double x, double y, BufferedImage style) {
@@ -19,14 +18,6 @@ public abstract class BoostItem extends GameObject implements Prize{
     }
 
     public abstract void onTouch(Map gameMap);
-
-    public boolean isRevealed() {
-        return revealed;
-    }
-
-    public void setRevealed(boolean revealed) {
-        this.revealed = revealed;
-    }
 
     @Override
     public int getPoint() {
@@ -47,13 +38,13 @@ public abstract class BoostItem extends GameObject implements Prize{
         }
     }
 
-    public void setPoint(int point) {
-        this.point = point;
-    }
-
     @Override
     public void reveal(Map gameMap){
         setY(getY()-48);
         revealed = true;
+    }
+
+    public void setPoint(int point) {
+        this.point = point;
     }
 }

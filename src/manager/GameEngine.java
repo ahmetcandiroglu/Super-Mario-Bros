@@ -7,6 +7,7 @@ import model.hero.Mario;
 import model.prize.BoostItem;
 import model.prize.Prize;
 import view.ImageLoader;
+import view.StartScreenSelection;
 import view.UIManager;
 import model.Map;
 
@@ -26,6 +27,7 @@ public class GameEngine implements Runnable {
     private Camera camera;
     private ImageLoader imageLoader;
     private Thread thread;
+    private StartScreenSelection selection = StartScreenSelection.START_GAME;
 
     private GameEngine() {
         init();
@@ -198,7 +200,7 @@ public class GameEngine implements Runnable {
             Enemy enemy = iterator.next();
             Rectangle enemyLeftBounds = enemy.getLeftBounds();
             if (marioRightBounds.intersects(enemyLeftBounds)) {
-                gameMap.setMario(mario.onTouchEnemy(imageLoader));
+                mario.onTouchEnemy(imageLoader);
                 iterator.remove();
             }
         }
@@ -219,7 +221,7 @@ public class GameEngine implements Runnable {
             Enemy enemy = iterator.next();
             Rectangle enemyRightBounds = enemy.getRightBounds();
             if (marioLeftBounds.intersects(enemyRightBounds)) {
-                gameMap.setMario(mario.onTouchEnemy(imageLoader));
+                mario.onTouchEnemy(imageLoader);
                 iterator.remove();
             }
         }
@@ -346,22 +348,68 @@ public class GameEngine implements Runnable {
         }
     }
 
-    public void notifyInput(ButtonAction input) {
+    public void receiveInput(ButtonAction input) {
         Mario mario = gameMap.getMario();
 
-        if(gameStatus != GameStatus.RUNNING)
-            return;
+        if(input == ButtonAction.GO_TO_START_SCREEN)
+            gameStatus = GameStatus.START_SCREEN;
 
-        if (input == ButtonAction.JUMP) {
-            mario.jump();
-        } else if (input == ButtonAction.M_RIGHT) {
-            mario.move(true, camera);
-        } else if (input == ButtonAction.M_LEFT) {
-            mario.move(false, camera);
-        } else if (input == ButtonAction.ACTION_COMPLETED) {
-            mario.setVelX(0);
-        } else if (input == ButtonAction.FIRE) {
-            mario.fire(gameMap);
+        if(gameStatus == GameStatus.START_SCREEN){
+            if(input == ButtonAction.SELECT && selection == StartScreenSelection.START_GAME){
+                startGame();
+            }
+            else if(input == ButtonAction.SELECT && selection == StartScreenSelection.VIEW_ABOUT){
+                gameStatus = GameStatus.ABOUT_SCREEN;
+            }
+            else if(input == ButtonAction.SELECT && selection == StartScreenSelection.VIEW_HELP){
+                gameStatus = GameStatus.HELP_SCREEN;
+            }
+            else if(input == ButtonAction.GO_UP){
+                selectOption(true);
+            }
+            else if(input == ButtonAction.GO_DOWN){
+                selectOption(false);
+            }
+        }
+
+        if(gameStatus == GameStatus.RUNNING){
+            if (input == ButtonAction.JUMP) {
+                mario.jump();
+            } else if (input == ButtonAction.M_RIGHT) {
+                mario.move(true, camera);
+            } else if (input == ButtonAction.M_LEFT) {
+                mario.move(false, camera);
+            } else if (input == ButtonAction.ACTION_COMPLETED) {
+                mario.setVelX(0);
+            } else if (input == ButtonAction.FIRE) {
+                mario.fire(gameMap);
+            } else if(input == ButtonAction.PAUSE_RESUME){
+                pauseGame();
+            }
+        }
+        else if(gameStatus == GameStatus.PAUSED){
+            if(input == ButtonAction.PAUSE_RESUME){
+                pauseGame();
+            }
+        }
+    }
+
+    private void selectOption(boolean selectUp) {
+        selection = selection.select(selectUp);
+    }
+
+    private void startGame() {
+        if(gameStatus != GameStatus.GAME_OVER) {
+            gameStatus = GameStatus.RUNNING;
+        }
+    }
+
+    private void pauseGame() {
+        if(gameStatus == GameStatus.RUNNING){
+            gameStatus = GameStatus.PAUSED;
+        }
+        else if(gameStatus == GameStatus.PAUSED){
+            gameStatus = GameStatus.RUNNING;
         }
     }
 
@@ -381,27 +429,16 @@ public class GameEngine implements Runnable {
         return gameMap;
     }
 
-    public static void main(String[] args) {
-
-        new GameEngine();
-    }
-
-    public void startGame() {
-        if(gameStatus != GameStatus.GAME_OVER) {
-            gameStatus = GameStatus.RUNNING;
-        }
-    }
-
-    public void pauseGame() {
-        if(gameStatus == GameStatus.RUNNING){
-            gameStatus = GameStatus.PAUSED;
-        }
-        else if(gameStatus == GameStatus.PAUSED){
-            gameStatus = GameStatus.RUNNING;
-        }
-    }
-
     public GameStatus getGameStatus() {
         return gameStatus;
+    }
+
+    public StartScreenSelection getSelection() {
+        return selection;
+    }
+
+    public static void main(String... args) {
+
+        new GameEngine();
     }
 }

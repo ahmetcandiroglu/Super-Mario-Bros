@@ -5,7 +5,6 @@ import manager.GameStatus;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -15,8 +14,7 @@ public class UIManager extends JPanel{
     private GameEngine engine;
     private Font gameFont;
     private BufferedImage startScreenImage, aboutScreenImage, helpScreenImage, gameOverScreen;
-    private BufferedImage heartIcon, sprite, coinIcon;
-
+    private BufferedImage sprite, heartIcon, coinIcon, selectIcon;
 
     public UIManager(GameEngine engine, int width, int height) {
         setPreferredSize(new Dimension(width, height));
@@ -24,13 +22,16 @@ public class UIManager extends JPanel{
         setMinimumSize(new Dimension(width, height));
 
         this.engine = engine;
-        this.sprite = engine.getImageLoader().loadImage("/sprite.png");
-        this.heartIcon = engine.getImageLoader().loadImage("/heart-icon.png");
-        this.coinIcon = engine.getImageLoader().getSubImage(sprite, 1, 5, 48, 48);
-        this.startScreenImage = engine.getImageLoader().loadImage("/start-screen.png");
-        this.helpScreenImage = engine.getImageLoader().loadImage("/help-screen.png");
-        this.aboutScreenImage = engine.getImageLoader().loadImage("/about-screen.png");
-        this.gameOverScreen = engine.getImageLoader().loadImage("/game-over.png");
+        ImageLoader loader = engine.getImageLoader();
+
+        this.sprite = loader.loadImage("/sprite.png");
+        this.heartIcon = loader.loadImage("/heart-icon.png");
+        this.coinIcon = loader.getSubImage(sprite, 1, 5, 48, 48);
+        this.selectIcon = loader.loadImage("/select-icon.png");
+        this.startScreenImage = loader.loadImage("/start-screen.png");
+        this.helpScreenImage = loader.loadImage("/help-screen.png");
+        this.aboutScreenImage = loader.loadImage("/about-screen.png");
+        this.gameOverScreen = loader.loadImage("/game-over.png");
 
         try {
             gameFont = Font.createFont(Font.TRUETYPE_FONT, new File("./src/media/font/mario-font.ttf"));
@@ -122,6 +123,8 @@ public class UIManager extends JPanel{
     }
 
     private void drawStartScreen(Graphics2D g2){
+        int row = engine.getSelection().getLineNumber();
         g2.drawImage(startScreenImage, 0, 0, null);
+        g2.drawImage(selectIcon, 375, row * 70 + 440, null);
     }
 }

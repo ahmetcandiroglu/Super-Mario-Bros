@@ -1,16 +1,12 @@
 package model.prize;
 
 import model.Map;
-import model.hero.FireMario;
 import model.hero.Mario;
-import model.hero.SmallMario;
-import model.hero.SuperMario;
+import model.hero.MarioForm;
+import view.Animation;
 import view.ImageLoader;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 public class FireFlower extends BoostItem {
 
@@ -23,21 +19,21 @@ public class FireFlower extends BoostItem {
     public void onTouch(Map gameMap) {
         Mario mario = gameMap.getMario();
         mario.acquirePoints(getPoint());
+
         ImageLoader imageLoader = new ImageLoader();
 
-        if(!(mario instanceof FireMario) ){
-            Mario newMario = new FireMario(
-                    mario.getX(),
-                    mario.getY(),
-                    imageLoader.getLeftFrames(2),
-                    imageLoader.getRightFrames(2));
+        if(!mario.getMarioForm().isFire()){
+            BufferedImage[] leftFrames = imageLoader.getLeftFrames(MarioForm.FIRE);
+            BufferedImage[] rightFrames = imageLoader.getRightFrames(MarioForm.FIRE);
 
-            newMario.setRemainingLives(mario.getRemainingLives());
-            newMario.setPoints(mario.getPoints());
-            newMario.setCoins(mario.getCoins());
-            gameMap.setMario(newMario);
+            Animation animation = new Animation(leftFrames, rightFrames);
+            MarioForm newForm = new MarioForm(animation, true, true);
+            mario.setMarioForm(newForm);
+            mario.setDimension(48, 96);
         }
     }
 
+    @Override
+    public void updateLocation(){}
 
 }

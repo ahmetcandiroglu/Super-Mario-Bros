@@ -1,7 +1,8 @@
 package model.hero;
 
 import manager.Camera;
-import model.enemy.Enemy;
+import model.Fireball;
+import model.Map;
 import view.Animation;
 import model.GameObject;
 import view.ImageLoader;
@@ -9,108 +10,41 @@ import view.ImageLoader;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public abstract class Mario extends GameObject{
+public class Mario extends GameObject{
 
     private int remainingLives;
     private int coins;
     private int points;
     private double invincibilityTimer;
-    private boolean strong, shootFire, invincible;
-    private Animation marioAnimation;
+    private MarioForm marioForm;
     private boolean toRight = true;
 
-    public Mario(double x, double y, BufferedImage[] leftFrames, BufferedImage[] rightFrames){
+    public Mario(double x, double y){
         super(x, y, null);
-        setDimension(48,96);
+        setDimension(48,48);
 
         remainingLives = 3;
         points = 0;
         coins = 0;
         invincibilityTimer = 0;
 
-        marioAnimation = new Animation(leftFrames, rightFrames);
-        setStyle(marioAnimation.getRightFrames()[1]);
+        ImageLoader imageLoader = new ImageLoader();
+        BufferedImage[] leftFrames = imageLoader.getLeftFrames(MarioForm.SMALL);
+        BufferedImage[] rightFrames = imageLoader.getRightFrames(MarioForm.SMALL);
+
+        Animation animation = new Animation(leftFrames, rightFrames);
+        marioForm = new MarioForm(animation, false, false);
+        setStyle(marioForm.getCurrentStyle(toRight, false, false));
     }
 
     @Override
     public void draw(Graphics g){
-        if((isJumping() || isFalling()) && toRight){
-            setStyle(marioAnimation.getRightFrames()[0]);
-        }
-        else if(isJumping() || isFalling()){
-            setStyle(marioAnimation.getLeftFrames()[0]);
-        }
-        else if(getVelX() != 0){
-            setStyle(marioAnimation.animate(5, toRight));
-        }
-        else {
-            if(toRight){
-                setStyle(marioAnimation.getRightFrames()[1]);
-            }
-            else
-                setStyle(marioAnimation.getLeftFrames()[1]);
-        }
+        boolean movingInX = (getVelX() != 0);
+        boolean movingInY = (getVelY() != 0);
+
+        setStyle(marioForm.getCurrentStyle(toRight, movingInX, movingInY));
+
         super.draw(g);
-    }
-
-    public int getRemainingLives() {
-        return remainingLives;
-    }
-
-    public void setRemainingLives(int remainingLives) {
-        this.remainingLives = remainingLives;
-    }
-
-    public double getInvincibilityTimer() {
-        return invincibilityTimer;
-    }
-
-    public void setInvincibilityTimer(double invincibilityTimer) {
-        this.invincibilityTimer = invincibilityTimer;
-    }
-
-    public boolean isStrong() {
-        return strong;
-    }
-
-    public void setStrong(boolean strong) {
-        this.strong = strong;
-    }
-
-    public boolean isShootFire() {
-        return shootFire;
-    }
-
-    public void setShootFire(boolean shootFire) {
-        this.shootFire = shootFire;
-    }
-
-    public boolean isInvincible() {
-        return invincible;
-    }
-
-    public void setInvincible(boolean invincible) {
-        this.invincible = invincible;
-    }
-
-    public void acquirePoints(int point){
-        points = points + point;
-    }
-
-    public int getPoints() {
-        return points;
-    }
-
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
-    public int getCoins() {
-        return coins;
-    }
-
-    public void setCoins(int coins) {
-        this.coins = coins;
     }
 
     public void jump() {
@@ -131,19 +65,52 @@ public abstract class Mario extends GameObject{
         this.toRight = toRight;
     }
 
-    public Mario onTouchEnemy(ImageLoader imageLoader) {
-        BufferedImage[] leftFrames = imageLoader.getLeftFrames(0);
-        BufferedImage[] rightFrames = imageLoader.getRightFrames(0);
+    public void onTouchEnemy(ImageLoader imageLoader) {
 
-        Mario newMario = new SmallMario(this.getX(), this.getY(),leftFrames, rightFrames);
-        newMario.setRemainingLives(this.getRemainingLives());
-        newMario.setPoints(this.getPoints());
-        newMario.setCoins(this.getCoins());
+        if(!marioForm.isSuper() && !marioForm.isFire()){
+            remainingLives--;
+        }
+        else{
+            marioForm = marioForm.onTouchEnemy(imageLoader);
+            setDimension(48, 48);
+        }
+    }
 
-        return newMario;
+    public void fire(Map gameMap){
+        Fireball fireball = marioForm.fire(toRight, getX(), getY());
+        if(fireball != null)
+            gameMap.addFireball(fireball);
     }
 
     public void acquireCoin() {
         coins++;
+    }
+
+    public void acquirePoints(int point){
+        points = points + point;
+    }
+
+    public int getRemainingLives() {
+        return remainingLives;
+    }
+
+    public void setRemainingLives(int remainingLives) {
+        this.remainingLives = remainingLives;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public int getCoins() {
+        return coins;
+    }
+
+    public MarioForm getMarioForm() {
+        return marioForm;
+    }
+
+    public void setMarioForm(MarioForm marioForm) {
+        this.marioForm = marioForm;
     }
 }

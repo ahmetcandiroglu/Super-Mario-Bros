@@ -1,16 +1,12 @@
 package model.prize;
 
 import model.Map;
-import model.hero.FireMario;
 import model.hero.Mario;
-import model.hero.SmallMario;
-import model.hero.SuperMario;
+import model.hero.MarioForm;
+import view.Animation;
 import view.ImageLoader;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 public class SuperMushroom extends BoostItem{
 
@@ -23,29 +19,17 @@ public class SuperMushroom extends BoostItem{
     public void onTouch(Map gameMap) {
         Mario mario = gameMap.getMario();
         mario.acquirePoints(getPoint());
+
         ImageLoader imageLoader = new ImageLoader();
 
-        if(!(mario instanceof SuperMario) ){
-            Mario newMario = new SuperMario(
-                    mario.getX(),
-                    mario.getY(),
-                    imageLoader.getLeftFrames(1),
-                    imageLoader.getRightFrames(1));
+        if(!mario.getMarioForm().isSuper()){
+            BufferedImage[] leftFrames = imageLoader.getLeftFrames(MarioForm.SUPER);
+            BufferedImage[] rightFrames = imageLoader.getRightFrames(MarioForm.SUPER);
 
-            newMario.setRemainingLives(mario.getRemainingLives());
-            newMario.setPoints(mario.getPoints());
-            newMario.setCoins(mario.getCoins());
-            gameMap.setMario(newMario);
+            Animation animation = new Animation(leftFrames, rightFrames);
+            MarioForm newForm = new MarioForm(animation, true, false);
+            mario.setMarioForm(newForm);
+            mario.setDimension(48, 96);
         }
-    }
-
-    private BufferedImage loadSuperStyle(){
-        BufferedImage style = null;
-        try {
-            style = ImageIO.read( new File("./src/media/mario/super-mario.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return style;
     }
 }

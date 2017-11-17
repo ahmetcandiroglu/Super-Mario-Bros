@@ -20,46 +20,42 @@ public class InputManager implements KeyListener{
         int keyCode = event.getKeyCode();
 
         if (keyCode == KeyEvent.VK_UP) {
-            action = ButtonAction.JUMP;
+            if(engine.getGameStatus() == GameStatus.START_SCREEN)
+                action = ButtonAction.GO_UP;
+            else
+                action = ButtonAction.JUMP;
+        } else if(keyCode == KeyEvent.VK_DOWN){
+            if(engine.getGameStatus() == GameStatus.START_SCREEN)
+                action = ButtonAction.GO_DOWN;
         } else if (keyCode == KeyEvent.VK_RIGHT) {
             action = ButtonAction.M_RIGHT;
         } else if (keyCode == KeyEvent.VK_LEFT) {
             action = ButtonAction.M_LEFT;
         } else if (keyCode == KeyEvent.VK_ENTER) {
-            action = ButtonAction.START;
+            action = ButtonAction.SELECT;
         } else if (keyCode == KeyEvent.VK_ESCAPE) {
-            action = ButtonAction.PAUSE_RESUME;
+            if(engine.getGameStatus() == GameStatus.RUNNING || engine.getGameStatus() == GameStatus.PAUSED )
+                action = ButtonAction.PAUSE_RESUME;
+            else
+                action = ButtonAction.GO_TO_START_SCREEN;
+
+        } else if (keyCode == KeyEvent.VK_SPACE){
+            action = ButtonAction.FIRE;
         }
 
-        analyzeInput(action);
+        notifyInput(action);
     }
 
     @Override
     public void keyReleased(KeyEvent event) {
         int keyCode = event.getKeyCode();
-        analyzeInput(ButtonAction.ACTION_COMPLETED);
+        notifyInput(ButtonAction.ACTION_COMPLETED);
     }
 
-    private void analyzeInput(ButtonAction action) {
-        if (action == ButtonAction.START) {
-            startGame();
-        }
-        else if (action == ButtonAction.PAUSE_RESUME) {
-            pauseOrResumeGame();
-        }
-        else{
-            engine.notifyInput(action);
-        }
+    private void notifyInput(ButtonAction action) {
+        if(action != ButtonAction.NO_ACTION)
+            engine.receiveInput(action);
     }
-
-    private void startGame() {
-
-    }
-
-    private void pauseOrResumeGame() {
-
-    }
-
     @Override
     public void keyTyped(KeyEvent arg0) {
         // TODO Auto-generated method stub

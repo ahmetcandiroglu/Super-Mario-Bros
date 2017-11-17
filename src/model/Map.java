@@ -111,7 +111,14 @@ public class Map {
         drawPrizes(g2);
         drawBricks(g2);
         drawEnemies(g2);
+        drawFireballs(g2);
         drawMario(g2);
+    }
+
+    private void drawFireballs(Graphics2D g2) {
+        for(Fireball fireball : fireballs){
+            fireball.draw(g2);
+        }
     }
 
     private void drawPrizes(Graphics2D g2) {
@@ -167,6 +174,10 @@ public class Map {
                 ((BoostItem) prize).updateLocation();
             }
         }
+
+        for (Fireball fireball: fireballs) {
+            fireball.updateLocation();
+        }
     }
 
     public ArrayList<Brick> getAllBricks() {
@@ -184,5 +195,9 @@ public class Map {
 
     public void addRevealedPrize(Prize prize) {
         revealedPrizes.add(prize);
+    }
+
+    public void addFireball(Fireball fireball) {
+        fireballs.add(fireball);
     }
 }

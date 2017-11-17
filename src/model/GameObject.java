@@ -34,6 +34,7 @@ public abstract class GameObject {
             g.drawImage(style, (int)x, (int)y, null);
         }
 
+        //for debugging
         /*Graphics2D g2 = (Graphics2D)g;
         g2.setColor(Color.WHITE);
 
@@ -125,11 +126,11 @@ public abstract class GameObject {
     }
 
     public Rectangle getTopBounds(){
-        return new Rectangle((int)x + dimension.width/5, (int)y, 3*dimension.width/5, dimension.height/2);
+        return new Rectangle((int)x+dimension.width/6, (int)y, 2*dimension.width/3, dimension.height/2);
     }
 
     public Rectangle getBottomBounds(){
-        return new Rectangle((int)x + dimension.width/5, (int)y + dimension.height/2, 3*dimension.width/5, dimension.height/2);
+        return new Rectangle((int)x+dimension.width/6, (int)y + dimension.height/2, 2*dimension.width/3, dimension.height/2);
     }
 
     public Rectangle getLeftBounds(){

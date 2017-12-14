@@ -41,7 +41,7 @@ class MapCreator {
     }
 
     Map createMap(String mapPath, double timeLimit) {
-        BufferedImage mapImage = imageLoader.loadImage("/map.png");
+        BufferedImage mapImage = imageLoader.loadImage(mapPath);
 
         if (mapImage == null) {
             System.out.println("Given path is invalid...");

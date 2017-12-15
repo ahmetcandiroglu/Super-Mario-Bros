@@ -442,6 +442,8 @@ public class GameEngine implements Runnable {
             }
         } else if(gameStatus == GameStatus.GAME_OVER && input == ButtonAction.GO_TO_START_SCREEN){
             reset();
+        } else if(gameStatus == GameStatus.MISSION_PASSED && input == ButtonAction.GO_TO_START_SCREEN){
+            reset();
         }
 
         if(input == ButtonAction.GO_TO_START_SCREEN){

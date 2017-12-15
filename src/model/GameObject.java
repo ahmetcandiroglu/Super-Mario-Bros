@@ -20,6 +20,11 @@ public abstract class GameObject {
     public GameObject(double x, double y, BufferedImage style){
         setLocation(x, y);
         setStyle(style);
+
+        if(style != null){
+            setDimension(style.getWidth(), style.getHeight());
+        }
+
         setVelX(0);
         setVelY(0);
         setGravityAcc(0.38);

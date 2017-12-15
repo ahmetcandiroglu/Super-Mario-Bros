@@ -1,6 +1,7 @@
 package model;
 
 import model.brick.Brick;
+import model.brick.OrdinaryBrick;
 import model.enemy.Enemy;
 import model.hero.Mario;
 import model.prize.BoostItem;
@@ -20,7 +21,9 @@ public class Map {
     private ArrayList<Enemy> enemies = new ArrayList<>();
     private ArrayList<Brick> groundBricks = new ArrayList<>();
     private ArrayList<Prize> revealedPrizes = new ArrayList<>();
+    private ArrayList<Brick> revealedBricks = new ArrayList<>();
     private ArrayList<Fireball> fireballs = new ArrayList<>();
+    private Point endPoint;
     private BufferedImage backgroundImage;
     private double bottomBorder = 720 - 96;
 
@@ -178,6 +181,15 @@ public class Map {
         for (Fireball fireball: fireballs) {
             fireball.updateLocation();
         }
+
+        for(Iterator<Brick> brickIterator = revealedBricks.iterator(); brickIterator.hasNext();){
+            OrdinaryBrick brick = (OrdinaryBrick)brickIterator.next();
+            brick.animate();
+            if(brick.getFrames() < 0){
+                bricks.remove(brick);
+                brickIterator.remove();
+            }
+        }
     }
 
     public ArrayList<Brick> getAllBricks() {
@@ -199,5 +211,17 @@ public class Map {
 
     public void addFireball(Fireball fireball) {
         fireballs.add(fireball);
+    }
+
+    public void setEndPoint(Point endPoint) {
+        this.endPoint = endPoint;
+    }
+
+    public Point getEndPoint() {
+        return endPoint;
+    }
+
+    public void addRevealedBrick(OrdinaryBrick ordinaryBrick) {
+        revealedBricks.add(ordinaryBrick);
     }
 }

@@ -43,7 +43,4 @@ public class Animation {
         return rightFrames;
     }
 
-    public BufferedImage getCurrentFrame() {
-        return currentFrame;
-    }
 }

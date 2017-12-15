@@ -1,5 +1,6 @@
 package model.prize;
 
+import manager.GameEngine;
 import model.Map;
 import model.hero.Mario;
 import model.hero.MarioForm;
@@ -36,4 +37,9 @@ public class FireFlower extends BoostItem {
     @Override
     public void updateLocation(){}
 
+
+    @Override
+    public void playOnTouch(GameEngine engine) {
+
+    }
 }

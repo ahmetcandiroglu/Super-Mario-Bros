@@ -1,6 +1,7 @@
 package model.hero;
 
 import manager.Camera;
+import manager.GameEngine;
 import model.Fireball;
 import model.Map;
 import view.Animation;
@@ -47,10 +48,11 @@ public class Mario extends GameObject{
         super.draw(g);
     }
 
-    public void jump() {
+    public void jump(GameEngine engine) {
         if(!isJumping() && !isFalling()){
             setJumping(true);
             setVelY(10);
+            engine.playJump();
         }
     }
 
@@ -65,9 +67,10 @@ public class Mario extends GameObject{
         this.toRight = toRight;
     }
 
-    public void onTouchEnemy(ImageLoader imageLoader) {
+    public void onTouchEnemy(ImageLoader imageLoader, GameEngine engine) {
 
         if(!marioForm.isSuper() && !marioForm.isFire()){
+            engine.playMarioDies();
             remainingLives--;
         }
         else{
@@ -112,5 +115,9 @@ public class Mario extends GameObject{
 
     public void setMarioForm(MarioForm marioForm) {
         this.marioForm = marioForm;
+    }
+
+    public boolean isSuper() {
+        return marioForm.isSuper();
     }
 }

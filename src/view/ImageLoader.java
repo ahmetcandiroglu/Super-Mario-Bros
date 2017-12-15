@@ -8,11 +8,11 @@ import java.io.IOException;
 public class ImageLoader {
 
     private BufferedImage marioForms;
-    private BufferedImage brickSprite;
+    private BufferedImage brickAnimation;
 
     public ImageLoader(){
         marioForms = loadImage("/mario-forms.png");
-        //brickSprite = loadImage("/brick-sprite.png");
+        brickAnimation = loadImage("/brick-animation.png");
     }
 
     public BufferedImage loadImage(String path){
@@ -40,6 +40,9 @@ public class ImageLoader {
     }
 
     public BufferedImage getSubImage(BufferedImage image, int col, int row, int w, int h){
+        if(col == 1 && row == 3){ //koopa
+            return image.getSubimage(0, 128, w, h);
+        }
         return image.getSubimage((col-1)*48, (row-1)*48, w, h);
     }
 
@@ -88,6 +91,10 @@ public class ImageLoader {
     }
 
     public BufferedImage[] getBrickFrames() {
-        return null;
+        BufferedImage[] frames = new BufferedImage[4];
+        for(int i = 0; i < 4; i++){
+            frames[i] = brickAnimation.getSubimage(i*105, 0, 105, 105);
+        }
+        return frames;
     }
 }

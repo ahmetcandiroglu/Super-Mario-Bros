@@ -69,9 +69,10 @@ public class UIManager extends JPanel{
             drawGameOverScreen(g2);
         }
         else {
-            g2.translate(-engine.getCamera().getX(), -engine.getCamera().getY());
-            engine.getGameMap().drawMap(g2);
-            g2.translate(engine.getCamera().getX(), engine.getCamera().getY());
+            Point camLocation = engine.getCameraLocation();
+            g2.translate(-camLocation.x, -camLocation.y);
+            engine.drawMap(g2);
+            g2.translate(camLocation.x, camLocation.y);
 
             drawPoints(g2);
             drawRemainingLives(g2);
@@ -80,9 +81,20 @@ public class UIManager extends JPanel{
             if(gameStatus == GameStatus.PAUSED){
                 drawPauseScreen(g2);
             }
+            else if(gameStatus == GameStatus.MISSION_PASSED){
+                drawVictoryScreen(g2);
+            }
         }
 
         g2.dispose();
+    }
+
+    private void drawVictoryScreen(Graphics2D g2) {
+        g2.setFont(gameFont.deriveFont(50f));
+        g2.setColor(Color.WHITE);
+        String displayedStr = "YOU WON!";
+        int stringLength = g2.getFontMetrics().stringWidth(displayedStr);
+        g2.drawString(displayedStr, (getWidth()-stringLength)/2, getHeight()/2);
     }
 
     private void drawHelpScreen(Graphics2D g2) {

@@ -7,5 +7,5 @@ public enum GameStatus {
     START_SCREEN,
     MAP_SELECTION,
     HELP_SCREEN,
-    ABOUT_SCREEN
+    MISSION_PASSED, ABOUT_SCREEN
 }

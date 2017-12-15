@@ -1,5 +1,6 @@
 package model.prize;
 
+import manager.GameEngine;
 import model.Map;
 import model.hero.Mario;
 
@@ -17,5 +18,10 @@ public class OneUpMushroom extends BoostItem{
         Mario mario = gameMap.getMario();
         mario.acquirePoints(getPoint());
         mario.setRemainingLives(mario.getRemainingLives() + 1);
+    }
+
+    @Override
+    public void playOnTouch(GameEngine engine) {
+        engine.playOneUp();
     }
 }

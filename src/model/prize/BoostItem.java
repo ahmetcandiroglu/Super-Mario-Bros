@@ -1,5 +1,7 @@
 package model.prize;
 
+import manager.GameEngine;
+import manager.GameStatus;
 import model.GameObject;
 import model.Map;
 import model.hero.Mario;
@@ -47,4 +49,6 @@ public abstract class BoostItem extends GameObject implements Prize{
     public void setPoint(int point) {
         this.point = point;
     }
+
+    public abstract void playOnTouch(GameEngine engine);
 }

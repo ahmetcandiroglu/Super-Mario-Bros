@@ -37,7 +37,7 @@ class MapCreator {
         this.groundBrick = imageLoader.getSubImage(sprite, 2, 2, 48, 48);
         this.pipe = imageLoader.getSubImage(sprite, 3, 1, 96, 96);
         this.goomba = imageLoader.getSubImage(sprite, 2, 4, 48, 48);
-        this.koopa = imageLoader.getSubImage(sprite, 1, 3, 48, 96);
+        this.koopa = imageLoader.getSubImage(sprite, 1, 3, 48, 64);
     }
 
     Map createMap(String mapPath, double timeLimit) {
@@ -58,7 +58,7 @@ class MapCreator {
         int pipe = new Color(0, 255, 0).getRGB();
         int goomba = new Color(0, 255, 255).getRGB();
         int koopa = new Color(255, 0, 255).getRGB();
-
+        int end = new Color(160, 0, 160).getRGB();
 
         for (int x = 0; x < mapImage.getWidth(); x++) {
             for (int y = 0; y < mapImage.getHeight(); y++) {
@@ -95,6 +95,10 @@ class MapCreator {
                 else if (currentPixel == mario) {
                     Mario marioObject = new Mario(xLocation, yLocation);
                     createdMap.setMario(marioObject);
+                }
+                else if(currentPixel == end){
+                    Point endPoint = new Point(xLocation, yLocation);
+                    createdMap.setEndPoint(endPoint);
                 }
             }
         }

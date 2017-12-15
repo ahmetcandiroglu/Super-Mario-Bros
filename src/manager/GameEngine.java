@@ -22,6 +22,7 @@ public class GameEngine implements Runnable {
 
     private Map gameMap;
     private UIManager uiManager;
+    private SoundManager soundManager;
     private GameStatus gameStatus;
     private boolean isRunning;
     private Camera camera;
@@ -34,21 +35,13 @@ public class GameEngine implements Runnable {
         init();
     }
 
-    private synchronized void start() {
-        if (isRunning)
-            return;
-
-        isRunning = true;
-        thread = new Thread(this);
-        thread.start();
-    }
-
     private void init() {
         imageLoader = new ImageLoader();
         InputManager inputManager = new InputManager(this);
         gameStatus = GameStatus.START_SCREEN;
         camera = new Camera();
         uiManager = new UIManager(this, WIDTH, HEIGHT);
+        soundManager = new SoundManager();
 
         JFrame frame = new JFrame("Super Mario Bros.");
         frame.add(uiManager);
@@ -61,6 +54,20 @@ public class GameEngine implements Runnable {
         frame.setVisible(true);
 
         start();
+    }
+
+    private synchronized void start() {
+        if (isRunning)
+            return;
+
+        isRunning = true;
+        thread = new Thread(this);
+        thread.start();
+    }
+
+    private void reset(){
+        camera = new Camera();
+        setGameStatus(GameStatus.START_SCREEN);
     }
 
     public void selectMapViaMouse() {
@@ -86,7 +93,6 @@ public class GameEngine implements Runnable {
         gameMap = mapCreator.createMap("/maps/" + path, 400);
         setGameStatus(GameStatus.RUNNING);
     }
-
 
     @Override
     public void run() {
@@ -125,16 +131,25 @@ public class GameEngine implements Runnable {
         updateCamera();
 
         if (isGameOver()) {
-            gameStatus = GameStatus.GAME_OVER;
+            setGameStatus(GameStatus.GAME_OVER);
+        }
+
+        int missionPassed = passMission();
+        if(missionPassed > -1){
+            gameMap.getMario().acquirePoints(missionPassed);
+            setGameStatus(GameStatus.MISSION_PASSED);
         }
     }
 
     private void updateCamera() {
         double marioVelocityX = gameMap.getMario().getVelX();
+        double shiftAmount = 0;
 
         if (marioVelocityX > 0 && gameMap.getMario().getX() - 600 > camera.getX()) {
-            camera.setX(camera.getX() + marioVelocityX);
+            shiftAmount = marioVelocityX;
         }
+
+        camera.moveCam(shiftAmount, 0);
     }
 
     private void updateLocations() {
@@ -179,6 +194,7 @@ public class GameEngine implements Runnable {
             if (marioBottomBounds.intersects(enemyTopBounds)) {
                 mario.acquirePoints(100);
                 iterator.remove();
+                soundManager.playStomp();
             }
         }
 
@@ -217,8 +233,9 @@ public class GameEngine implements Runnable {
             Enemy enemy = iterator.next();
             Rectangle enemyLeftBounds = enemy.getLeftBounds();
             if (marioRightBounds.intersects(enemyLeftBounds)) {
-                mario.onTouchEnemy(imageLoader);
+                mario.onTouchEnemy(imageLoader, this);
                 iterator.remove();
+                shakeCamera();
             }
         }
     }
@@ -238,8 +255,9 @@ public class GameEngine implements Runnable {
             Enemy enemy = iterator.next();
             Rectangle enemyRightBounds = enemy.getRightBounds();
             if (marioLeftBounds.intersects(enemyRightBounds)) {
-                mario.onTouchEnemy(imageLoader);
+                mario.onTouchEnemy(imageLoader, this);
                 iterator.remove();
+                shakeCamera();
             }
         }
 
@@ -270,12 +288,23 @@ public class GameEngine implements Runnable {
                     enemy.setVelX(-enemy.getVelX());
                 }
 
-                if (enemyBottomBounds.intersects(brickTopBounds))
+                if (enemyBottomBounds.intersects(brickTopBounds)){
+                    enemy.setFalling(false);
+                    enemy.setVelY(0);
+                    enemy.setY(brick.getY()-enemy.getDimension().height);
                     standsOnBrick = true;
+                }
             }
 
-            if (!standsOnBrick && enemy.getY() + 48 < gameMap.getBottomBorder())
-                enemy.setVelX(-enemy.getVelX());
+            if(enemy.getY() + enemy.getDimension().height > gameMap.getBottomBorder()){
+                enemy.setFalling(false);
+                enemy.setVelY(0);
+                enemy.setY(gameMap.getBottomBorder()-enemy.getDimension().height);
+            }
+
+            if (!standsOnBrick && enemy.getY() < gameMap.getBottomBorder()){
+                enemy.setFalling(true);
+            }
         }
     }
 
@@ -338,6 +367,7 @@ public class GameEngine implements Runnable {
             if (prize instanceof BoostItem) {
                 Rectangle prizeBounds = ((BoostItem) prize).getBounds();
                 if (prizeBounds.intersects(marioBounds)) {
+                    prize.playOnTouch(this);
                     ((BoostItem) prize).onTouch(gameMap);
                     prizeIterator.remove();
                 }
@@ -366,17 +396,14 @@ public class GameEngine implements Runnable {
     }
 
     public void receiveInput(ButtonAction input) {
-        if (input == ButtonAction.GO_TO_START_SCREEN) {
-            gameStatus = GameStatus.START_SCREEN;
-        }
 
         if (gameStatus == GameStatus.START_SCREEN) {
             if (input == ButtonAction.SELECT && startScreenSelection == StartScreenSelection.START_GAME) {
                 startGame();
             } else if (input == ButtonAction.SELECT && startScreenSelection == StartScreenSelection.VIEW_ABOUT) {
-                gameStatus = GameStatus.ABOUT_SCREEN;
+                setGameStatus(GameStatus.ABOUT_SCREEN);
             } else if (input == ButtonAction.SELECT && startScreenSelection == StartScreenSelection.VIEW_HELP) {
-                gameStatus = GameStatus.HELP_SCREEN;
+                setGameStatus(GameStatus.HELP_SCREEN);
             } else if (input == ButtonAction.GO_UP) {
                 selectOption(true);
             } else if (input == ButtonAction.GO_DOWN) {
@@ -393,12 +420,10 @@ public class GameEngine implements Runnable {
             else if(input == ButtonAction.GO_DOWN){
                 changeSelectedMap(false);
             }
-        }
-
-        if (gameStatus == GameStatus.RUNNING) {
+        } else if (gameStatus == GameStatus.RUNNING) {
             Mario mario = gameMap.getMario();
             if (input == ButtonAction.JUMP) {
-                mario.jump();
+                mario.jump(this);
             } else if (input == ButtonAction.M_RIGHT) {
                 mario.move(true, camera);
             } else if (input == ButtonAction.M_LEFT) {
@@ -407,6 +432,7 @@ public class GameEngine implements Runnable {
                 mario.setVelX(0);
             } else if (input == ButtonAction.FIRE) {
                 mario.fire(gameMap);
+                soundManager.playFireball();
             } else if (input == ButtonAction.PAUSE_RESUME) {
                 pauseGame();
             }
@@ -414,6 +440,12 @@ public class GameEngine implements Runnable {
             if (input == ButtonAction.PAUSE_RESUME) {
                 pauseGame();
             }
+        } else if(gameStatus == GameStatus.GAME_OVER && input == ButtonAction.GO_TO_START_SCREEN){
+            reset();
+        }
+
+        if(input == ButtonAction.GO_TO_START_SCREEN){
+            setGameStatus(GameStatus.START_SCREEN);
         }
     }
 
@@ -423,16 +455,20 @@ public class GameEngine implements Runnable {
 
     private void startGame() {
         if (gameStatus != GameStatus.GAME_OVER) {
-            gameStatus = GameStatus.MAP_SELECTION;
+            setGameStatus(GameStatus.MAP_SELECTION);
         }
     }
 
     private void pauseGame() {
         if (gameStatus == GameStatus.RUNNING) {
-            gameStatus = GameStatus.PAUSED;
+            setGameStatus(GameStatus.PAUSED);
         } else if (gameStatus == GameStatus.PAUSED) {
-            gameStatus = GameStatus.RUNNING;
+            setGameStatus(GameStatus.RUNNING);
         }
+    }
+
+    private void shakeCamera(){
+        camera.shakeCamera();
     }
 
     private boolean isGameOver() {
@@ -445,14 +481,6 @@ public class GameEngine implements Runnable {
         return imageLoader;
     }
 
-    public Camera getCamera() {
-        return camera;
-    }
-
-    public Map getGameMap() {
-        return gameMap;
-    }
-
     public GameStatus getGameStatus() {
         return gameStatus;
     }
@@ -463,6 +491,12 @@ public class GameEngine implements Runnable {
 
     public void setGameStatus(GameStatus gameStatus) {
         this.gameStatus = gameStatus;
+
+        if(gameStatus == GameStatus.RUNNING){
+            soundManager.playBackground();
+        } else if(gameStatus == GameStatus.GAME_OVER){
+            soundManager.playGameOver();
+        }
     }
 
     public int getScore() {
@@ -478,11 +512,47 @@ public class GameEngine implements Runnable {
     }
 
     public static void main(String... args) {
-
         new GameEngine();
     }
 
     public int getSelectedMap() {
         return selectedMap;
+    }
+
+    public void drawMap(Graphics2D g2) {
+        gameMap.drawMap(g2);
+    }
+
+    public Point getCameraLocation() {
+        return new Point((int)camera.getX(), (int)camera.getY());
+    }
+
+    private int passMission(){
+        if(gameMap.getMario().getX() >= gameMap.getEndPoint().x){
+            int height = (int)gameMap.getMario().getY();
+            return height * 2;
+        }
+        else
+            return -1;
+    }
+
+    public void playCoin() {
+        soundManager.playCoin();
+    }
+
+    public void playOneUp() {
+        soundManager.playOneUp();
+    }
+
+    public void playSuperMushroom() {
+        soundManager.playSuperMushroom();
+    }
+
+    public void playMarioDies() {
+        soundManager.playMarioDies();
+    }
+
+    public void playJump() {
+        soundManager.playJump();
     }
 }

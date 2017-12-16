@@ -120,6 +120,7 @@ public class GameEngine implements Runnable {
 
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
+                mapManager.updateTime();
             }
         }
     }
@@ -332,5 +333,9 @@ public class GameEngine implements Runnable {
 
     public static void main(String... args) {
         new GameEngine();
+    }
+
+    public int getRemainingTime() {
+        return mapManager.getRemainingTime();
     }
 }

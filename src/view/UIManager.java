@@ -77,6 +77,7 @@ public class UIManager extends JPanel{
             drawPoints(g2);
             drawRemainingLives(g2);
             drawAcquiredCoins(g2);
+            drawRemainingTime(g2);
 
             if(gameStatus == GameStatus.PAUSED){
                 drawPauseScreen(g2);
@@ -87,6 +88,13 @@ public class UIManager extends JPanel{
         }
 
         g2.dispose();
+    }
+
+    private void drawRemainingTime(Graphics2D g2) {
+        g2.setFont(gameFont.deriveFont(25f));
+        g2.setColor(Color.WHITE);
+        String displayedStr = "TIME: " + engine.getRemainingTime();
+        g2.drawString(displayedStr, 750, 50);
     }
 
     private void drawVictoryScreen(Graphics2D g2) {
@@ -142,10 +150,10 @@ public class UIManager extends JPanel{
     private void drawPoints(Graphics2D g2){
         g2.setFont(gameFont.deriveFont(25f));
         g2.setColor(Color.WHITE);
-        String displayedStr = "" + engine.getScore();
+        String displayedStr = "Points: " + engine.getScore();
         int stringLength = g2.getFontMetrics().stringWidth(displayedStr);;
         //g2.drawImage(coinIcon, 50, 10, null);
-        g2.drawString(displayedStr, getWidth()/2-stringLength, 50);
+        g2.drawString(displayedStr, 300, 50);
     }
 
     private void drawStartScreen(Graphics2D g2){

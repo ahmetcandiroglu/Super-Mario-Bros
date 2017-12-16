@@ -60,7 +60,7 @@ public class MapManager {
     }
 
     public boolean isGameOver() {
-        return getMario().getRemainingLives() == 0;
+        return getMario().getRemainingLives() == 0 || map.isTimeOver();
     }
 
     public int getScore() {
@@ -367,5 +367,14 @@ public class MapManager {
 
     public void addRevealedBrick(OrdinaryBrick ordinaryBrick) {
         map.addRevealedBrick(ordinaryBrick);
+    }
+
+    public void updateTime(){
+        if(map != null)
+            map.updateTime(1);
+    }
+
+    public int getRemainingTime() {
+        return (int)map.getRemainingTime();
     }
 }

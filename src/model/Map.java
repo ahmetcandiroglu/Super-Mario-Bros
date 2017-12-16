@@ -24,9 +24,10 @@ public class Map {
     private ArrayList<Prize> revealedPrizes = new ArrayList<>();
     private ArrayList<Brick> revealedBricks = new ArrayList<>();
     private ArrayList<Fireball> fireballs = new ArrayList<>();
-    private Point endPoint;
+    private EndFlag endPoint;
     private BufferedImage backgroundImage;
     private double bottomBorder = 720 - 96;
+    private String path;
 
 
     public Map(double timeLimit, BufferedImage backgroundImage) {
@@ -83,6 +84,7 @@ public class Map {
         drawEnemies(g2);
         drawFireballs(g2);
         drawMario(g2);
+        endPoint.draw(g2);
     }
 
     private void drawFireballs(Graphics2D g2) {
@@ -108,7 +110,8 @@ public class Map {
 
     private void drawBricks(Graphics2D g2) {
         for(Brick brick : bricks){
-            brick.draw(g2);
+            if(brick != null)
+                brick.draw(g2);
         }
 
         for(Brick brick : groundBricks){
@@ -118,7 +121,8 @@ public class Map {
 
     private void drawEnemies(Graphics2D g2) {
         for(Enemy enemy : enemies){
-            enemy.draw(g2);
+            if(enemy != null)
+                enemy.draw(g2);
         }
     }
 
@@ -157,6 +161,8 @@ public class Map {
                 brickIterator.remove();
             }
         }
+
+        endPoint.updateLocation();
     }
 
     public double getBottomBorder() {
@@ -171,11 +177,11 @@ public class Map {
         fireballs.add(fireball);
     }
 
-    public void setEndPoint(Point endPoint) {
+    public void setEndPoint(EndFlag endPoint) {
         this.endPoint = endPoint;
     }
 
-    public Point getEndPoint() {
+    public EndFlag getEndPoint() {
         return endPoint;
     }
 
@@ -193,5 +199,13 @@ public class Map {
 
     public void removePrize(Prize object) {
         revealedPrizes.remove(object);
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

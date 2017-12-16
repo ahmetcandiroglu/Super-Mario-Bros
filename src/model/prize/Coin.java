@@ -1,7 +1,6 @@
 package model.prize;
 
 import manager.GameEngine;
-import manager.MapManager;
 import model.GameObject;
 import model.hero.Mario;
 
@@ -12,7 +11,7 @@ import java.awt.image.BufferedImage;
 public class Coin extends GameObject implements Prize{
 
     private int point;
-    private boolean revealed;
+    private boolean revealed, acquired = false;
     private int revealBoundary;
 
     public Coin(double x, double y, BufferedImage style, int point){
@@ -35,8 +34,11 @@ public class Coin extends GameObject implements Prize{
 
     @Override
     public void onTouch(Mario mario, GameEngine engine) {
-        mario.acquirePoints(point);
-        engine.playCoin();
+        if(!acquired){
+            acquired = true;
+            mario.acquirePoints(point);
+            engine.playCoin();
+        }
     }
 
     @Override

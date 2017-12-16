@@ -2,7 +2,6 @@ package model.hero;
 
 import manager.Camera;
 import manager.GameEngine;
-import model.Map;
 import view.Animation;
 import model.GameObject;
 import view.ImageLoader;
@@ -123,5 +122,13 @@ public class Mario extends GameObject{
 
     public boolean getToRight() {
         return toRight;
+    }
+
+    public void resetLocation() {
+        setVelX(0);
+        setVelY(0);
+        setX(50);
+        setJumping(false);
+        setFalling(true);
     }
 }

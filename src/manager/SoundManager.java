@@ -6,7 +6,12 @@ import javax.sound.sampled.Clip;
 
 public class SoundManager {
 
-    public SoundManager() {}
+    private Clip background;
+    private long clipTime = 0;
+
+    public SoundManager() {
+        background = getClip(loadAudio("background"));
+    }
 
     private AudioInputStream loadAudio(String url) {
         try {
@@ -33,10 +38,19 @@ public class SoundManager {
         return null;
     }
 
-    public void playBackground() {
-        Clip clip = getClip(loadAudio("background"));
-        clip.start();
+    public void resumeBackground(){
+        background.setMicrosecondPosition(clipTime);
+        background.start();
+    }
 
+    public void pauseBackground(){
+        clipTime = background.getMicrosecondPosition();
+        background.stop();
+    }
+
+    public void restartBackground() {
+        clipTime = 0;
+        resumeBackground();
     }
 
     public void playJump() {

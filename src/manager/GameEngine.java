@@ -1,20 +1,12 @@
 package manager;
 
-import model.hero.Fireball;
-import model.brick.Brick;
-import model.enemy.Enemy;
 import model.hero.Mario;
-import model.prize.BoostItem;
-import model.prize.Prize;
 import view.ImageLoader;
 import view.StartScreenSelection;
 import view.UIManager;
-import model.Map;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 public class GameEngine implements Runnable {
 
@@ -67,8 +59,13 @@ public class GameEngine implements Runnable {
     }
 
     private void reset(){
-        camera = new Camera();
+        resetCamera();
         setGameStatus(GameStatus.START_SCREEN);
+    }
+
+    public void resetCamera(){
+        camera = new Camera();
+        soundManager.restartBackground();
     }
 
     public void selectMapViaMouse() {
@@ -91,8 +88,10 @@ public class GameEngine implements Runnable {
 
     private void createMap(String path) {
         boolean loaded = mapManager.createMap(imageLoader, path);
-        if(loaded)
+        if(loaded){
             setGameStatus(GameStatus.RUNNING);
+            soundManager.restartBackground();
+        }
 
         else
             setGameStatus(GameStatus.START_SCREEN);
@@ -141,8 +140,9 @@ public class GameEngine implements Runnable {
         int missionPassed = passMission();
         if(missionPassed > -1){
             mapManager.acquirePoints(missionPassed);
+            //setGameStatus(GameStatus.MISSION_PASSED);
+        } else if(mapManager.endLevel())
             setGameStatus(GameStatus.MISSION_PASSED);
-        }
     }
 
     private void updateCamera() {
@@ -233,8 +233,10 @@ public class GameEngine implements Runnable {
     private void pauseGame() {
         if (gameStatus == GameStatus.RUNNING) {
             setGameStatus(GameStatus.PAUSED);
+            soundManager.pauseBackground();
         } else if (gameStatus == GameStatus.PAUSED) {
             setGameStatus(GameStatus.RUNNING);
+            soundManager.resumeBackground();
         }
     }
 
@@ -262,12 +264,6 @@ public class GameEngine implements Runnable {
 
     public void setGameStatus(GameStatus gameStatus) {
         this.gameStatus = gameStatus;
-
-        if(gameStatus == GameStatus.RUNNING){
-            soundManager.playBackground();
-        } else if(gameStatus == GameStatus.GAME_OVER){
-            soundManager.playGameOver();
-        }
     }
 
     public int getScore() {
@@ -280,10 +276,6 @@ public class GameEngine implements Runnable {
 
     public int getCoins() {
         return mapManager.getCoins();
-    }
-
-    public static void main(String... args) {
-        new GameEngine();
     }
 
     public int getSelectedMap() {
@@ -336,5 +328,9 @@ public class GameEngine implements Runnable {
 
     public MapManager getMapManager() {
         return mapManager;
+    }
+
+    public static void main(String... args) {
+        new GameEngine();
     }
 }

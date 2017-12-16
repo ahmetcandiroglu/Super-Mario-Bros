@@ -49,6 +49,7 @@ public class InputManager implements KeyListener, MouseListener{
             currentAction = ButtonAction.FIRE;
         }
 
+
         notifyInput(currentAction);
     }
 
@@ -61,7 +62,8 @@ public class InputManager implements KeyListener, MouseListener{
 
     @Override
     public void keyReleased(KeyEvent event) {
-        notifyInput(ButtonAction.ACTION_COMPLETED);
+        if(event.getKeyCode() == KeyEvent.VK_RIGHT || event.getKeyCode() == KeyEvent.VK_LEFT)
+            notifyInput(ButtonAction.ACTION_COMPLETED);
     }
 
     private void notifyInput(ButtonAction action) {

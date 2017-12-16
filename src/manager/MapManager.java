@@ -19,8 +19,7 @@ public class MapManager {
 
     private Map map;
 
-    public MapManager() {
-    }
+    public MapManager() {}
 
     public void updateLocations() {
         if (map == null)
@@ -30,10 +29,11 @@ public class MapManager {
     }
 
     public void resetCurrentMap(GameEngine engine) {
-    }
-
-    public void setMap(Map map) {
-        this.map = map;
+        Mario mario = getMario();
+        mario.resetLocation();
+        engine.resetCamera();
+        createMap(engine.getImageLoader(), map.getPath());
+        map.setMario(mario);
     }
 
     public boolean createMap(ImageLoader loader, String path) {
@@ -80,12 +80,17 @@ public class MapManager {
     }
 
     public int passMission() {
-        if(getMario().getX() >= map.getEndPoint().x){
+        if(getMario().getX() >= map.getEndPoint().getX() && !map.getEndPoint().isTouched()){
+            map.getEndPoint().setTouched(true);
             int height = (int)getMario().getY();
             return height * 2;
         }
         else
             return -1;
+    }
+
+    public boolean endLevel(){
+        return getMario().getX() >= map.getEndPoint().getX() + 320;
     }
 
     public void checkCollisions(GameEngine engine) {
@@ -306,6 +311,8 @@ public class MapManager {
             if (prizeBounds.intersects(marioBounds)) {
                 prize.onTouch(getMario(), engine);
                 toBeRemoved.add((GameObject) prize);
+            } else if(prize instanceof Coin){
+                prize.onTouch(getMario(), engine);
             }
         }
 

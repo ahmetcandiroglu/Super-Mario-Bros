@@ -1,8 +1,7 @@
 package model.hero;
 
 import manager.Camera;
-import model.Fireball;
-import model.Map;
+import manager.GameEngine;
 import view.Animation;
 import model.GameObject;
 import view.ImageLoader;
@@ -47,10 +46,11 @@ public class Mario extends GameObject{
         super.draw(g);
     }
 
-    public void jump() {
+    public void jump(GameEngine engine) {
         if(!isJumping() && !isFalling()){
             setJumping(true);
             setVelY(10);
+            engine.playJump();
         }
     }
 
@@ -65,21 +65,23 @@ public class Mario extends GameObject{
         this.toRight = toRight;
     }
 
-    public void onTouchEnemy(ImageLoader imageLoader) {
+    public boolean onTouchEnemy(GameEngine engine){
 
         if(!marioForm.isSuper() && !marioForm.isFire()){
             remainingLives--;
+            engine.playMarioDies();
+            return true;
         }
         else{
-            marioForm = marioForm.onTouchEnemy(imageLoader);
+            engine.shakeCamera();
+            marioForm = marioForm.onTouchEnemy(engine.getImageLoader());
             setDimension(48, 48);
+            return false;
         }
     }
 
-    public void fire(Map gameMap){
-        Fireball fireball = marioForm.fire(toRight, getX(), getY());
-        if(fireball != null)
-            gameMap.addFireball(fireball);
+    public Fireball fire(){
+        return marioForm.fire(toRight, getX(), getY());
     }
 
     public void acquireCoin() {
@@ -112,5 +114,21 @@ public class Mario extends GameObject{
 
     public void setMarioForm(MarioForm marioForm) {
         this.marioForm = marioForm;
+    }
+
+    public boolean isSuper() {
+        return marioForm.isSuper();
+    }
+
+    public boolean getToRight() {
+        return toRight;
+    }
+
+    public void resetLocation() {
+        setVelX(0);
+        setVelY(0);
+        setX(50);
+        setJumping(false);
+        setFalling(true);
     }
 }

@@ -1,7 +1,9 @@
 package model;
 
 import model.brick.Brick;
+import model.brick.OrdinaryBrick;
 import model.enemy.Enemy;
+import model.hero.Fireball;
 import model.hero.Mario;
 import model.prize.BoostItem;
 import model.prize.Coin;
@@ -20,9 +22,12 @@ public class Map {
     private ArrayList<Enemy> enemies = new ArrayList<>();
     private ArrayList<Brick> groundBricks = new ArrayList<>();
     private ArrayList<Prize> revealedPrizes = new ArrayList<>();
+    private ArrayList<Brick> revealedBricks = new ArrayList<>();
     private ArrayList<Fireball> fireballs = new ArrayList<>();
+    private EndFlag endPoint;
     private BufferedImage backgroundImage;
     private double bottomBorder = 720 - 96;
+    private String path;
 
 
     public Map(double timeLimit, BufferedImage backgroundImage) {
@@ -30,13 +35,6 @@ public class Map {
         this.timeLimit = timeLimit;
     }
 
-    public double getTimeLimit() {
-        return timeLimit;
-    }
-
-    public void setTimeLimit(double timeLimit) {
-        this.timeLimit = timeLimit;
-    }
 
     public Mario getMario() {
         return mario;
@@ -46,52 +44,25 @@ public class Map {
         this.mario = mario;
     }
 
-    public ArrayList<Brick> getBricks() {
-        return bricks;
-    }
-
-    public void setBricks(ArrayList<Brick> bricks) {
-        this.bricks = bricks;
-    }
-
     public ArrayList<Enemy> getEnemies() {
         return enemies;
-    }
-
-    public void setEnemies(ArrayList<Enemy> enemies) {
-        this.enemies = enemies;
-    }
-
-    public ArrayList<Brick> getGroundBricks() {
-        return groundBricks;
-    }
-
-    public void setGroundBricks(ArrayList<Brick> groundBricks) {
-        this.groundBricks = groundBricks;
     }
 
     public ArrayList<Fireball> getFireballs() {
         return fireballs;
     }
 
-    public void setFireballs(ArrayList<Fireball> fireballs) {
-        this.fireballs = fireballs;
-    }
-
     public ArrayList<Prize> getRevealedPrizes() {
         return revealedPrizes;
     }
 
-    public void setRevealedPrizes(ArrayList<Prize> revealedPrizes) {
-        this.revealedPrizes = revealedPrizes;
-    }
+    public ArrayList<Brick> getAllBricks() {
+        ArrayList<Brick> allBricks = new ArrayList<>();
 
-    public BufferedImage getBackgroundImage() {
-        return backgroundImage;
-    }
+        allBricks.addAll(bricks);
+        allBricks.addAll(groundBricks);
 
-    public void setBackgroundImage(BufferedImage backgroundImage) {
-        this.backgroundImage = backgroundImage;
+        return allBricks;
     }
 
     public void addBrick(Brick brick) {
@@ -113,6 +84,7 @@ public class Map {
         drawEnemies(g2);
         drawFireballs(g2);
         drawMario(g2);
+        endPoint.draw(g2);
     }
 
     private void drawFireballs(Graphics2D g2) {
@@ -138,7 +110,8 @@ public class Map {
 
     private void drawBricks(Graphics2D g2) {
         for(Brick brick : bricks){
-            brick.draw(g2);
+            if(brick != null)
+                brick.draw(g2);
         }
 
         for(Brick brick : groundBricks){
@@ -148,7 +121,8 @@ public class Map {
 
     private void drawEnemies(Graphics2D g2) {
         for(Enemy enemy : enemies){
-            enemy.draw(g2);
+            if(enemy != null)
+                enemy.draw(g2);
         }
     }
 
@@ -178,15 +152,17 @@ public class Map {
         for (Fireball fireball: fireballs) {
             fireball.updateLocation();
         }
-    }
 
-    public ArrayList<Brick> getAllBricks() {
-        ArrayList<Brick> allBricks = new ArrayList<>();
+        for(Iterator<Brick> brickIterator = revealedBricks.iterator(); brickIterator.hasNext();){
+            OrdinaryBrick brick = (OrdinaryBrick)brickIterator.next();
+            brick.animate();
+            if(brick.getFrames() < 0){
+                bricks.remove(brick);
+                brickIterator.remove();
+            }
+        }
 
-        allBricks.addAll(bricks);
-        allBricks.addAll(groundBricks);
-
-        return allBricks;
+        endPoint.updateLocation();
     }
 
     public double getBottomBorder() {
@@ -199,5 +175,37 @@ public class Map {
 
     public void addFireball(Fireball fireball) {
         fireballs.add(fireball);
+    }
+
+    public void setEndPoint(EndFlag endPoint) {
+        this.endPoint = endPoint;
+    }
+
+    public EndFlag getEndPoint() {
+        return endPoint;
+    }
+
+    public void addRevealedBrick(OrdinaryBrick ordinaryBrick) {
+        revealedBricks.add(ordinaryBrick);
+    }
+
+    public void removeFireball(Fireball object) {
+        fireballs.remove(object);
+    }
+
+    public void removeEnemy(Enemy object) {
+        enemies.remove(object);
+    }
+
+    public void removePrize(Prize object) {
+        revealedPrizes.remove(object);
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

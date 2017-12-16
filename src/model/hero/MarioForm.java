@@ -1,6 +1,5 @@
 package model.hero;
 
-import model.Fireball;
 import view.Animation;
 import view.ImageLoader;
 

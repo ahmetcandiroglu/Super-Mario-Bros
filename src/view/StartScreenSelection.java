@@ -23,12 +23,10 @@ public enum StartScreenSelection {
 
         if(lineNumber > -1 && lineNumber < 3){
             selection = lineNumber - (toUp ? 1 : -1);
-            System.out.println(selection);
             if(selection == -1)
                 selection = 2;
             else if(selection == 3)
                 selection = 0;
-            System.out.println(selection);
             return getSelection(selection);
         }
 

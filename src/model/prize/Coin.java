@@ -37,6 +37,7 @@ public class Coin extends GameObject implements Prize{
         if(!acquired){
             acquired = true;
             mario.acquirePoints(point);
+            mario.acquireCoin();
             engine.playCoin();
         }
     }

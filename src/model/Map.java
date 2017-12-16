@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 public class Map {
 
-    private double timeLimit;
+    private double remainingTime;
     private Mario mario;
     private ArrayList<Brick> bricks = new ArrayList<>();
     private ArrayList<Enemy> enemies = new ArrayList<>();
@@ -30,9 +30,9 @@ public class Map {
     private String path;
 
 
-    public Map(double timeLimit, BufferedImage backgroundImage) {
+    public Map(double remainingTime, BufferedImage backgroundImage) {
         this.backgroundImage = backgroundImage;
-        this.timeLimit = timeLimit;
+        this.remainingTime = remainingTime;
     }
 
 
@@ -207,5 +207,17 @@ public class Map {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public void updateTime(double passed){
+        remainingTime = remainingTime - passed;
+    }
+
+    public boolean isTimeOver(){
+        return remainingTime <= 0;
+    }
+
+    public double getRemainingTime() {
+        return remainingTime;
     }
 }

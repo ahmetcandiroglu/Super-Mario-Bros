@@ -3,6 +3,8 @@ package manager;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 
 public class SoundManager {
 
@@ -15,9 +17,9 @@ public class SoundManager {
 
     private AudioInputStream loadAudio(String url) {
         try {
-            AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                    getClass().getResourceAsStream("/media/audio/" + url + ".wav"));
-            return inputStream;
+            InputStream audioSrc = getClass().getResourceAsStream("/media/audio/" + url + ".wav");
+            InputStream bufferedIn = new BufferedInputStream(audioSrc);
+            return AudioSystem.getAudioInputStream(bufferedIn);
 
         } catch (Exception e) {
             System.err.println(e.getMessage());

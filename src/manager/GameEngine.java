@@ -1,6 +1,6 @@
 package manager;
 
-import model.Fireball;
+import model.hero.Fireball;
 import model.brick.Brick;
 import model.enemy.Enemy;
 import model.hero.Mario;
@@ -20,7 +20,7 @@ public class GameEngine implements Runnable {
 
     private final static int WIDTH = 1268, HEIGHT = 708;
 
-    private Map gameMap;
+    private MapManager mapManager;
     private UIManager uiManager;
     private SoundManager soundManager;
     private GameStatus gameStatus;
@@ -42,6 +42,7 @@ public class GameEngine implements Runnable {
         camera = new Camera();
         uiManager = new UIManager(this, WIDTH, HEIGHT);
         soundManager = new SoundManager();
+        mapManager = new MapManager();
 
         JFrame frame = new JFrame("Super Mario Bros.");
         frame.add(uiManager);
@@ -89,9 +90,12 @@ public class GameEngine implements Runnable {
     }
 
     private void createMap(String path) {
-        MapCreator mapCreator = new MapCreator(imageLoader);
-        gameMap = mapCreator.createMap("/maps/" + path, 400);
-        setGameStatus(GameStatus.RUNNING);
+        boolean loaded = mapManager.createMap(imageLoader, path);
+        if(loaded)
+            setGameStatus(GameStatus.RUNNING);
+
+        else
+            setGameStatus(GameStatus.START_SCREEN);
     }
 
     @Override
@@ -136,16 +140,17 @@ public class GameEngine implements Runnable {
 
         int missionPassed = passMission();
         if(missionPassed > -1){
-            gameMap.getMario().acquirePoints(missionPassed);
+            mapManager.acquirePoints(missionPassed);
             setGameStatus(GameStatus.MISSION_PASSED);
         }
     }
 
     private void updateCamera() {
-        double marioVelocityX = gameMap.getMario().getVelX();
+        Mario mario = mapManager.getMario();
+        double marioVelocityX = mario.getVelX();
         double shiftAmount = 0;
 
-        if (marioVelocityX > 0 && gameMap.getMario().getX() - 600 > camera.getX()) {
+        if (marioVelocityX > 0 && mario.getX() - 600 > camera.getX()) {
             shiftAmount = marioVelocityX;
         }
 
@@ -153,246 +158,11 @@ public class GameEngine implements Runnable {
     }
 
     private void updateLocations() {
-        gameMap.updateLocations();
+        mapManager.updateLocations();
     }
 
     private void checkCollisions() {
-        Mario mario = gameMap.getMario();
-        ArrayList<Brick> bricks = gameMap.getAllBricks();
-        ArrayList<Enemy> enemies = gameMap.getEnemies();
-        ArrayList<Prize> revealedPrizes = gameMap.getRevealedPrizes();
-        ArrayList<Fireball> fireballs = gameMap.getFireballs();
-
-        checkBottomCollisions(mario, bricks, enemies);
-        checkTopCollisions(mario, bricks, enemies);
-        checkRightCollisions(mario, bricks, enemies);
-        checkLeftCollisions(mario, bricks, enemies);
-        checkEnemyCollisions(bricks, enemies);
-        checkFireballContact(mario, fireballs, enemies);
-        checkPrizeContact(mario, revealedPrizes);
-        checkPrizeCollision(revealedPrizes, bricks);
-    }
-
-    private void checkBottomCollisions(Mario mario, ArrayList<Brick> bricks, ArrayList<Enemy> enemies) {
-        Rectangle marioBottomBounds = mario.getBottomBounds();
-
-        if (!mario.isJumping())
-            mario.setFalling(true);
-
-        for (Brick brick : bricks) {
-            Rectangle brickTopBounds = brick.getTopBounds();
-            if (marioBottomBounds.intersects(brickTopBounds)) {
-                mario.setY(brick.getY() - mario.getDimension().height + 1);
-                mario.setFalling(false);
-                mario.setVelY(0);
-            }
-        }
-
-        for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
-            Enemy enemy = iterator.next();
-            Rectangle enemyTopBounds = enemy.getTopBounds();
-            if (marioBottomBounds.intersects(enemyTopBounds)) {
-                mario.acquirePoints(100);
-                iterator.remove();
-                soundManager.playStomp();
-            }
-        }
-
-        if (mario.getY() + mario.getDimension().height >= gameMap.getBottomBorder()) {
-            mario.setY(gameMap.getBottomBorder() - mario.getDimension().height);
-            mario.setFalling(false);
-            mario.setVelY(0);
-        }
-    }
-
-    private void checkTopCollisions(Mario mario, ArrayList<Brick> bricks, ArrayList<Enemy> enemies) {
-        Rectangle marioTopBounds = mario.getTopBounds();
-
-        for (Brick brick : bricks) {
-            Rectangle brickBottomBounds = brick.getBottomBounds();
-            if (marioTopBounds.intersects(brickBottomBounds)) {
-                mario.setVelY(0);
-                mario.setY(brick.getY() + brick.getDimension().height);
-                brick.reveal(gameMap);
-            }
-        }
-    }
-
-    private void checkRightCollisions(Mario mario, ArrayList<Brick> bricks, ArrayList<Enemy> enemies) {
-        Rectangle marioRightBounds = mario.getRightBounds();
-
-        for (Brick brick : bricks) {
-            Rectangle brickLeftBounds = brick.getLeftBounds();
-            if (marioRightBounds.intersects(brickLeftBounds)) {
-                mario.setVelX(0);
-                mario.setX(brick.getX() - mario.getDimension().width);
-            }
-        }
-
-        for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
-            Enemy enemy = iterator.next();
-            Rectangle enemyLeftBounds = enemy.getLeftBounds();
-            if (marioRightBounds.intersects(enemyLeftBounds)) {
-                mario.onTouchEnemy(imageLoader, this);
-                iterator.remove();
-                shakeCamera();
-            }
-        }
-    }
-
-    private void checkLeftCollisions(Mario mario, ArrayList<Brick> bricks, ArrayList<Enemy> enemies) {
-        Rectangle marioLeftBounds = mario.getLeftBounds();
-
-        for (Brick brick : bricks) {
-            Rectangle brickRightBounds = brick.getRightBounds();
-            if (marioLeftBounds.intersects(brickRightBounds)) {
-                mario.setVelX(0);
-                mario.setX(brick.getX() + brick.getDimension().width);
-            }
-        }
-
-        for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
-            Enemy enemy = iterator.next();
-            Rectangle enemyRightBounds = enemy.getRightBounds();
-            if (marioLeftBounds.intersects(enemyRightBounds)) {
-                mario.onTouchEnemy(imageLoader, this);
-                iterator.remove();
-                shakeCamera();
-            }
-        }
-
-        if (mario.getX() <= camera.getX() && mario.getVelX() < 0) {
-            mario.setVelX(0);
-            mario.setX(camera.getX());
-        }
-    }
-
-    private void checkEnemyCollisions(ArrayList<Brick> bricks, ArrayList<Enemy> enemies) {
-
-        for (Enemy enemy : enemies) {
-            boolean standsOnBrick = false;
-
-            for (Brick brick : bricks) {
-                Rectangle enemyBounds = enemy.getLeftBounds();
-                Rectangle brickBounds = brick.getRightBounds();
-
-                Rectangle enemyBottomBounds = enemy.getBottomBounds();
-                Rectangle brickTopBounds = brick.getTopBounds();
-
-                if (enemy.getVelX() > 0) {
-                    enemyBounds = enemy.getRightBounds();
-                    brickBounds = brick.getLeftBounds();
-                }
-
-                if (enemyBounds.intersects(brickBounds)) {
-                    enemy.setVelX(-enemy.getVelX());
-                }
-
-                if (enemyBottomBounds.intersects(brickTopBounds)){
-                    enemy.setFalling(false);
-                    enemy.setVelY(0);
-                    enemy.setY(brick.getY()-enemy.getDimension().height);
-                    standsOnBrick = true;
-                }
-            }
-
-            if(enemy.getY() + enemy.getDimension().height > gameMap.getBottomBorder()){
-                enemy.setFalling(false);
-                enemy.setVelY(0);
-                enemy.setY(gameMap.getBottomBorder()-enemy.getDimension().height);
-            }
-
-            if (!standsOnBrick && enemy.getY() < gameMap.getBottomBorder()){
-                enemy.setFalling(true);
-            }
-        }
-    }
-
-    private void checkPrizeCollision(ArrayList<Prize> prizes, ArrayList<Brick> bricks) {
-        for (Prize prize : prizes) {
-            if (prize instanceof BoostItem) {
-                BoostItem boost = (BoostItem) prize;
-                Rectangle prizeBottomBounds = boost.getBottomBounds();
-                Rectangle prizeRightBounds = boost.getRightBounds();
-                Rectangle prizeLeftBounds = boost.getLeftBounds();
-                boost.setFalling(true);
-
-                for (Brick brick : bricks) {
-                    Rectangle brickBounds;
-
-                    if (boost.isFalling()) {
-                        brickBounds = brick.getTopBounds();
-
-                        if (brickBounds.intersects(prizeBottomBounds)) {
-                            boost.setFalling(false);
-                            boost.setVelY(0);
-                            boost.setY(brick.getY() - boost.getDimension().height + 1);
-                            if (boost.getVelX() == 0)
-                                boost.setVelX(2);
-                        }
-                    }
-
-                    if (boost.getVelX() > 0) {
-                        brickBounds = brick.getLeftBounds();
-
-                        if (brickBounds.intersects(prizeRightBounds)) {
-                            boost.setVelX(-boost.getVelX());
-                        }
-                    } else if (boost.getVelX() < 0) {
-                        brickBounds = brick.getRightBounds();
-
-                        if (brickBounds.intersects(prizeLeftBounds)) {
-                            boost.setVelX(-boost.getVelX());
-                        }
-                    }
-                }
-
-                if (boost.getY() + boost.getDimension().height > gameMap.getBottomBorder()) {
-                    boost.setFalling(false);
-                    boost.setVelY(0);
-                    boost.setY(gameMap.getBottomBorder() - boost.getDimension().height);
-                    if (boost.getVelX() == 0)
-                        boost.setVelX(2);
-                }
-
-            }
-        }
-    }
-
-    private void checkPrizeContact(Mario mario, ArrayList<Prize> prizes) {
-        Rectangle marioBounds = mario.getBounds();
-
-        for (Iterator<Prize> prizeIterator = prizes.iterator(); prizeIterator.hasNext(); ) {
-            Prize prize = prizeIterator.next();
-            if (prize instanceof BoostItem) {
-                Rectangle prizeBounds = ((BoostItem) prize).getBounds();
-                if (prizeBounds.intersects(marioBounds)) {
-                    prize.playOnTouch(this);
-                    ((BoostItem) prize).onTouch(gameMap);
-                    prizeIterator.remove();
-                }
-            }
-        }
-
-    }
-
-    private void checkFireballContact(Mario mario, ArrayList<Fireball> fireballs, ArrayList<Enemy> enemies) {
-
-        for (Iterator<Fireball> fireballIterator = fireballs.iterator(); fireballIterator.hasNext(); ) {
-            Fireball fireball = fireballIterator.next();
-            Rectangle fireballBounds = fireball.getBounds();
-
-            for (Iterator<Enemy> enemyIterator = enemies.iterator(); enemyIterator.hasNext(); ) {
-                Enemy enemy = enemyIterator.next();
-                Rectangle enemyBounds = enemy.getBounds();
-
-                if (fireballBounds.intersects(enemyBounds)) {
-                    mario.acquirePoints(100);
-                    fireballIterator.remove();
-                    enemyIterator.remove();
-                }
-            }
-        }
+        mapManager.checkCollisions(this);
     }
 
     public void receiveInput(ButtonAction input) {
@@ -421,7 +191,7 @@ public class GameEngine implements Runnable {
                 changeSelectedMap(false);
             }
         } else if (gameStatus == GameStatus.RUNNING) {
-            Mario mario = gameMap.getMario();
+            Mario mario = mapManager.getMario();
             if (input == ButtonAction.JUMP) {
                 mario.jump(this);
             } else if (input == ButtonAction.M_RIGHT) {
@@ -431,8 +201,7 @@ public class GameEngine implements Runnable {
             } else if (input == ButtonAction.ACTION_COMPLETED) {
                 mario.setVelX(0);
             } else if (input == ButtonAction.FIRE) {
-                mario.fire(gameMap);
-                soundManager.playFireball();
+                mapManager.fire(this);
             } else if (input == ButtonAction.PAUSE_RESUME) {
                 pauseGame();
             }
@@ -469,13 +238,13 @@ public class GameEngine implements Runnable {
         }
     }
 
-    private void shakeCamera(){
+    public void shakeCamera(){
         camera.shakeCamera();
     }
 
     private boolean isGameOver() {
         if(gameStatus == GameStatus.RUNNING)
-            return gameMap.getMario().getRemainingLives() == 0;
+            return mapManager.isGameOver();
         return false;
     }
 
@@ -502,15 +271,15 @@ public class GameEngine implements Runnable {
     }
 
     public int getScore() {
-        return gameMap.getMario().getPoints();
+        return mapManager.getScore();
     }
 
     public int getRemainingLives() {
-        return gameMap.getMario().getRemainingLives();
+        return mapManager.getRemainingLives();
     }
 
     public int getCoins() {
-        return gameMap.getMario().getCoins();
+        return mapManager.getCoins();
     }
 
     public static void main(String... args) {
@@ -522,7 +291,7 @@ public class GameEngine implements Runnable {
     }
 
     public void drawMap(Graphics2D g2) {
-        gameMap.drawMap(g2);
+        mapManager.drawMap(g2);
     }
 
     public Point getCameraLocation() {
@@ -530,12 +299,7 @@ public class GameEngine implements Runnable {
     }
 
     private int passMission(){
-        if(gameMap.getMario().getX() >= gameMap.getEndPoint().x){
-            int height = (int)gameMap.getMario().getY();
-            return height * 2;
-        }
-        else
-            return -1;
+        return mapManager.passMission();
     }
 
     public void playCoin() {
@@ -556,5 +320,21 @@ public class GameEngine implements Runnable {
 
     public void playJump() {
         soundManager.playJump();
+    }
+
+    public void playFireFlower() {
+        soundManager.playFireFlower();
+    }
+
+    public void playFireball() {
+        soundManager.playFireball();
+    }
+
+    public void playStomp() {
+        soundManager.playStomp();
+    }
+
+    public MapManager getMapManager() {
+        return mapManager;
     }
 }

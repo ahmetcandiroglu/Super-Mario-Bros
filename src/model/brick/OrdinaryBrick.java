@@ -1,6 +1,9 @@
 package model.brick;
 
+import manager.GameEngine;
+import manager.MapManager;
 import model.Map;
+import model.prize.Prize;
 import view.Animation;
 import view.ImageLoader;
 
@@ -31,15 +34,18 @@ public class OrdinaryBrick extends Brick {
     }
 
     @Override
-    public void reveal(Map gameMap){
-        if(!gameMap.getMario().isSuper())
-            return;
+    public Prize reveal(GameEngine engine){
+        MapManager manager = engine.getMapManager();
+        if(!manager.getMario().isSuper())
+            return null;
 
         breaking = true;
-        gameMap.addRevealedBrick(this);
+        manager.addRevealedBrick(this);
 
         double newX = getX() - 27, newY = getY() - 27;
         setLocation(newX, newY);
+
+        return null;
     }
 
     public int getFrames(){

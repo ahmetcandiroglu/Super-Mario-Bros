@@ -1,8 +1,8 @@
 package model.prize;
 
 import manager.GameEngine;
+import manager.MapManager;
 import model.GameObject;
-import model.Map;
 import model.hero.Mario;
 
 import java.awt.*;
@@ -29,15 +29,13 @@ public class Coin extends GameObject implements Prize{
     }
 
     @Override
-    public void reveal(Map gameMap) {
-        Mario mario = gameMap.getMario();
-        mario.acquirePoints(getPoint());
-        mario.acquireCoin();
+    public void reveal() {
         revealed = true;
     }
 
     @Override
-    public void playOnTouch(GameEngine engine) {
+    public void onTouch(Mario mario, GameEngine engine) {
+        mario.acquirePoints(point);
         engine.playCoin();
     }
 

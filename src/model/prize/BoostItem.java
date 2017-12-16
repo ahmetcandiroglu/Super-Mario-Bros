@@ -1,9 +1,8 @@
 package model.prize;
 
 import manager.GameEngine;
-import manager.GameStatus;
+import manager.MapManager;
 import model.GameObject;
-import model.Map;
 import model.hero.Mario;
 
 import java.awt.*;
@@ -19,7 +18,7 @@ public abstract class BoostItem extends GameObject implements Prize{
         setDimension(48, 48);
     }
 
-    public abstract void onTouch(Map gameMap);
+    public abstract void onTouch(Mario mario, GameEngine engine);
 
     @Override
     public int getPoint() {
@@ -41,7 +40,7 @@ public abstract class BoostItem extends GameObject implements Prize{
     }
 
     @Override
-    public void reveal(Map gameMap){
+    public void reveal(){
         setY(getY()-48);
         revealed = true;
     }
@@ -49,6 +48,4 @@ public abstract class BoostItem extends GameObject implements Prize{
     public void setPoint(int point) {
         this.point = point;
     }
-
-    public abstract void playOnTouch(GameEngine engine);
 }

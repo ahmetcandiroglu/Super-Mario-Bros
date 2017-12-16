@@ -1,5 +1,6 @@
 package model.brick;
 
+import manager.GameEngine;
 import model.Map;
 import model.hero.Mario;
 import model.prize.Prize;
@@ -19,19 +20,20 @@ public class SurpriseBrick extends Brick{
     }
 
     @Override
-    public void reveal(Map gameMap){
-        ImageLoader imageLoader = new ImageLoader();
-        BufferedImage newStyle = imageLoader.loadImage("/sprite.png");
-        newStyle = imageLoader.getSubImage(newStyle, 1, 2, 48, 48);
+    public Prize reveal(GameEngine engine){
+        BufferedImage newStyle = engine.getImageLoader().loadImage("/sprite.png");
+        newStyle = engine.getImageLoader().getSubImage(newStyle, 1, 2, 48, 48);
 
         if(prize != null){
-            gameMap.addRevealedPrize(prize);
-            prize.reveal(gameMap);
+            prize.reveal();
         }
 
         setEmpty(true);
         setStyle(newStyle);
+
+        Prize toReturn = this.prize;
         this.prize = null;
+        return toReturn;
     }
 
     @Override

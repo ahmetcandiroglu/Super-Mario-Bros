@@ -1,5 +1,6 @@
 package model.brick;
 
+import manager.GameEngine;
 import model.GameObject;
 import model.Map;
 import model.prize.Prize;
@@ -33,7 +34,7 @@ public abstract class Brick extends GameObject{
         this.empty = empty;
     }
 
-    public void reveal(Map gameMap){}
+    public Prize reveal(GameEngine engine){ return null;}
 
     public Prize getPrize() {
         return null;

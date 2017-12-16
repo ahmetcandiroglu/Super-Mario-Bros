@@ -3,6 +3,7 @@ package model;
 import model.brick.Brick;
 import model.brick.OrdinaryBrick;
 import model.enemy.Enemy;
+import model.hero.Fireball;
 import model.hero.Mario;
 import model.prize.BoostItem;
 import model.prize.Coin;
@@ -33,13 +34,6 @@ public class Map {
         this.timeLimit = timeLimit;
     }
 
-    public double getTimeLimit() {
-        return timeLimit;
-    }
-
-    public void setTimeLimit(double timeLimit) {
-        this.timeLimit = timeLimit;
-    }
 
     public Mario getMario() {
         return mario;
@@ -49,52 +43,25 @@ public class Map {
         this.mario = mario;
     }
 
-    public ArrayList<Brick> getBricks() {
-        return bricks;
-    }
-
-    public void setBricks(ArrayList<Brick> bricks) {
-        this.bricks = bricks;
-    }
-
     public ArrayList<Enemy> getEnemies() {
         return enemies;
-    }
-
-    public void setEnemies(ArrayList<Enemy> enemies) {
-        this.enemies = enemies;
-    }
-
-    public ArrayList<Brick> getGroundBricks() {
-        return groundBricks;
-    }
-
-    public void setGroundBricks(ArrayList<Brick> groundBricks) {
-        this.groundBricks = groundBricks;
     }
 
     public ArrayList<Fireball> getFireballs() {
         return fireballs;
     }
 
-    public void setFireballs(ArrayList<Fireball> fireballs) {
-        this.fireballs = fireballs;
-    }
-
     public ArrayList<Prize> getRevealedPrizes() {
         return revealedPrizes;
     }
 
-    public void setRevealedPrizes(ArrayList<Prize> revealedPrizes) {
-        this.revealedPrizes = revealedPrizes;
-    }
+    public ArrayList<Brick> getAllBricks() {
+        ArrayList<Brick> allBricks = new ArrayList<>();
 
-    public BufferedImage getBackgroundImage() {
-        return backgroundImage;
-    }
+        allBricks.addAll(bricks);
+        allBricks.addAll(groundBricks);
 
-    public void setBackgroundImage(BufferedImage backgroundImage) {
-        this.backgroundImage = backgroundImage;
+        return allBricks;
     }
 
     public void addBrick(Brick brick) {
@@ -192,15 +159,6 @@ public class Map {
         }
     }
 
-    public ArrayList<Brick> getAllBricks() {
-        ArrayList<Brick> allBricks = new ArrayList<>();
-
-        allBricks.addAll(bricks);
-        allBricks.addAll(groundBricks);
-
-        return allBricks;
-    }
-
     public double getBottomBorder() {
         return bottomBorder;
     }
@@ -223,5 +181,17 @@ public class Map {
 
     public void addRevealedBrick(OrdinaryBrick ordinaryBrick) {
         revealedBricks.add(ordinaryBrick);
+    }
+
+    public void removeFireball(Fireball object) {
+        fireballs.remove(object);
+    }
+
+    public void removeEnemy(Enemy object) {
+        enemies.remove(object);
+    }
+
+    public void removePrize(Prize object) {
+        revealedPrizes.remove(object);
     }
 }

@@ -1,9 +1,11 @@
-package model;
+package model.hero;
 
+
+import model.GameObject;
 
 import java.awt.image.BufferedImage;
 
-public class Fireball extends GameObject{
+public class Fireball extends GameObject {
 
     public Fireball(double x, double y, BufferedImage style, boolean toRight) {
         super(x, y, style);

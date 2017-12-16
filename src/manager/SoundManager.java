@@ -88,4 +88,8 @@ public class SoundManager {
         clip.start();
 
     }
+
+    public void playFireFlower() {
+
+    }
 }

@@ -11,12 +11,12 @@ public class MapSelectionItem {
     private Point location;
     private Dimension dimension;
 
-    public MapSelectionItem(File map, Point location){
+    public MapSelectionItem(String map, Point location){
         this.location = location;
-        this.name = map.getName();
+        this.name = map;
 
         ImageLoader loader = new ImageLoader();
-        this.image = loader.loadImage(map);
+        this.image = loader.loadImage("/maps/" + map);
 
         this.dimension = new Dimension();
     }

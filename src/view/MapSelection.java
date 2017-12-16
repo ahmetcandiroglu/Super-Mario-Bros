@@ -1,11 +1,11 @@
 package view;
 
 import java.awt.*;
-import java.io.File;
+import java.util.ArrayList;
 
 public class MapSelection {
 
-    private File[] maps;
+    private ArrayList<String> maps = new ArrayList<>();
     private MapSelectionItem[] mapSelectionItems;
 
     public MapSelection(){
@@ -17,8 +17,10 @@ public class MapSelection {
         g.setColor(Color.BLACK);
         g.fillRect(0,0, 1280, 720);
 
-        if(mapSelectionItems == null)
+        if(mapSelectionItems == null){
+            System.out.println(1);
             return;
+        }
 
         String title = "Select a Map";
         int x_location = (1280 - g.getFontMetrics().stringWidth(title))/2;
@@ -36,19 +38,20 @@ public class MapSelection {
     }
 
     private void getMaps(){
-        File file = new File("src/media/maps");
-        this.maps = file.listFiles();
+        //TODO: read from file
+        maps.add("Map 1.png");
+        maps.add("Map 2.png");
     }
 
-    private MapSelectionItem[] createItems(File[] maps){
+    private MapSelectionItem[] createItems(ArrayList<String> maps){
         if(maps == null)
             return null;
 
         int defaultGridSize = 100;
-        MapSelectionItem[] items = new MapSelectionItem[maps.length];
+        MapSelectionItem[] items = new MapSelectionItem[maps.size()];
         for (int i = 0; i < items.length; i++) {
             Point location = new Point(0, (i+1)*defaultGridSize+200);
-            items[i] = new MapSelectionItem(maps[i], location);
+            items[i] = new MapSelectionItem(maps.get(i), location);
         }
 
         return items;

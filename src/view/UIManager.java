@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class UIManager extends JPanel{
 
@@ -39,7 +40,8 @@ public class UIManager extends JPanel{
         this.gameOverScreen = loader.loadImage("/game-over.png");
 
         try {
-            gameFont = Font.createFont(Font.TRUETYPE_FONT, new File("./src/media/font/mario-font.ttf"));
+            InputStream in = getClass().getResourceAsStream("/media/font/mario-font.ttf");
+            gameFont = Font.createFont(Font.TRUETYPE_FONT, in);
         } catch (FontFormatException | IOException e) {
             gameFont = new Font("Verdana", Font.PLAIN, 12);
             e.printStackTrace();

@@ -1,11 +1,6 @@
 # Super Mario Bros.
 
-<img src="http://vignette2.wikia.nocookie.net/logopedia/images/c/cf/Super-mario-bros-logo.jpg/revision/latest?cb=20160216211236" 
-     width="500" 
-     height="350"
-/>
-
-Classic Super Mario Bros. game implemented with Java
+Classic Super Mario Bros. game implemented with Java for CS319-Object-Oriented Software Engineering course.
 
 ## About game
 
@@ -14,9 +9,13 @@ You can visit [wikipedia page](https://en.wikipedia.org/wiki/Super_Mario_Bros.) 
 ## Built With
 * [Java](https://www.java.com/)
 
-## Authors
-* Ahmet Çandıroğlu
-* Unas Sikandar Butt
-* Salih Zeki Okur
-* Sencer Umut Balkan
-* Mert Sezer
+## In-game Screens
+
+### Start Screen
+![start screen](https://raw.githubusercontent.com/ahmetcandiroglu/1G.Super-Mario-Bros/master/docs/Screenshots/Start%20screen.png)
+
+### Inside Game
+![in game screen](https://raw.githubusercontent.com/ahmetcandiroglu/1G.Super-Mario-Bros/master/docs/Screenshots/In%20game%20screen.png)
+
+### Pause Screen
+![pause screen](https://raw.githubusercontent.com/ahmetcandiroglu/1G.Super-Mario-Bros/master/docs/Screenshots/Pause%20screen.png)

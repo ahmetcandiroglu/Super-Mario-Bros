@@ -118,6 +118,10 @@ public class GameEngine implements Runnable {
             }
             render();
 
+            if(gameStatus != GameStatus.RUNNING) {
+                timer = System.currentTimeMillis();
+            }
+
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
                 mapManager.updateTime();
